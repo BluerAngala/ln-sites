@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="联系广东岭南律师事务所">
+  <title>联系我们 | 广东岭南律师事务所</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=EB+Garamond:wght@400;500&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-overlay"></div>
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">岭南<span>.</span></a>
+      <div class="nav-toggle"><span></span><span></span><span></span></div>
+      <ul class="nav-menu">
+        <li><a href="about.html" class="nav-link">关于</a></li>
+        <li><a href="practice.html" class="nav-link">业务</a></li>
+        <li><a href="team.html" class="nav-link">团队</a></li>
+        <li><a href="news.html" class="nav-link">动态</a></li>
+        <li><a href="honors.html" class="nav-link">荣誉</a></li>
+        <li><a href="social.html" class="nav-link">公益</a></li>
+        <li><a href="contact.html" class="nav-link">委托</a></li>
+      </ul>
+      <button id="themeToggle" class="theme-toggle" onclick="toggleTheme()" aria-label="切换主题" title="切换主题">○</button>
+    </div>
+  </nav>
+
+  <main>
+    <section class="page-header">
+      <div class="container"><h1>联系我们</h1><p>期待与您建立联系</p></div>
+    </section>
+
+    <section class="section contact-full">
+      <div class="container">
+        <div class="contact-grid">
+          <div class="contact-info fade-in">
+            <h3>联系方式</h3>
+            
+            <div class="contact-item">
+              <div class="contact-item-icon"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+              <div>
+                <span class="contact-item-label">地址</span>
+                <p class="contact-item-value">广州市海珠区阅江西路370号<br>广报中心北塔15F</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-item-icon"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
+              <div>
+                <span class="contact-item-label">电话</span>
+                <p class="contact-item-value">020-81836088</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-item-icon"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg></div>
+              <div>
+                <span class="contact-item-label">邮箱</span>
+                <p class="contact-item-value">public@lnlawfirm.cn</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-item-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
+              <div>
+                <span class="contact-item-label">工作时间</span>
+                <p class="contact-item-value">周一至周五 9:00-18:00<br>周六 9:00-12:00</p>
+              </div>
+            </div>
+
+            <div class="contact-map">
+              <svg class="map-svg" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg" aria-label="办公地址示意图">
+                <defs>
+                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="var(--border)" stroke-width="0.5"/>
+                  </pattern>
+                </defs>
+                <rect width="800" height="300" fill="var(--bg-elevated)"/>
+                <rect width="800" height="300" fill="url(#grid)"/>
+                <circle cx="400" cy="150" r="8" fill="var(--accent)"/>
+                <circle cx="400" cy="150" r="20" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.4"/>
+                <line x1="400" y1="0" x2="400" y2="300" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.3"/>
+                <line x1="0" y1="150" x2="800" y2="150" stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.3"/>
+                <text x="400" y="280" text-anchor="middle" fill="var(--text-secondary)" font-size="14" font-family="var(--font-chinese), serif" letter-spacing="2">广州市海珠区阅江西路370号 · 广报中心北塔15F</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="contact-form fade-in">
+            <h3>在线咨询</h3>
+            <form id="contact-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="name">姓名 *</label>
+                  <input type="text" id="name" name="name" class="form-input" placeholder="请输入您的姓名" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="phone">电话 *</label>
+                  <input type="tel" id="phone" name="phone" class="form-input" placeholder="请输入您的手机号码" required>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="email">邮箱</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="请输入您的电子邮箱">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="subject">咨询类型</label>
+                <input type="text" id="subject" name="subject" class="form-input" placeholder="如：金融证券、房产纠纷、诉讼代理等">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label" for="message">咨询内容 *</label>
+                <textarea id="message" name="message" class="form-textarea" placeholder="请详细描述您需要咨询的问题，我们将尽快与您联系。" required></textarea>
+              </div>
+              
+              <button type="submit" class="form-submit">提交咨询</button>
+              
+              <div class="form-success">
+                <p>感谢您的咨询，我们的律师将在1个工作日内与您联系。</p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section cta-section">
+      <div class="container">
+        <div class="cta-content fade-in">
+          <h2 class="cta-title">立即获取专业法律支持</h2>
+          <div class="cta-info">
+            <div class="cta-info-item"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>020-81836088</span></div>
+            <div class="cta-info-item"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>public@lnlawfirm.cn</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand"><h3>岭南<span>.</span></h3><p>广东岭南律师事务所创立于1984年，由中山大学法律系创办。历经四十载发展，已成长为华南地区最具影响力的综合性律师事务所之一。</p></div>
+        <div class="footer-col"><h4>快速导航</h4><ul><li><a href="about.html">关于我们</a></li><li><a href="practice.html">业务领域</a></li><li><a href="team.html">律师团队</a></li><li><a href="news.html">新闻动态</a></li></ul>
+</div>
+        <div class="footer-col"><h4>更多内容</h4><ul><li><a href="honors.html">荣誉资质</a></li><li><a href="social.html">社会责任</a></li><li><a href="contact.html">联系我们</a></li></ul>
+</div>
+        <div class="footer-col"><h4>联系方式</h4><ul><li><a href="tel:020-81836088">020-81836088</a></li><li><a href="mailto:public@lnlawfirm.cn">public@lnlawfirm.cn</a></li><li><a href="contact.html">在线留言</a></li></ul>
+</div>
+      </div>
+      <div class="footer-bottom"><p class="footer-copy">© 2025 广东岭南律师事务所 版权所有</p><div class="footer-links"><a href="index.html">首页</a><a href="about.html">关于</a><a href="contact.html">联系</a></div></div>
+    </div>
+  </footer>
+  <script src="js/main.js"></script>
+</body>
+</html>
