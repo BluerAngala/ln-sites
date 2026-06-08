@@ -1,0 +1,95 @@
+---
+/**
+ * 荣誉墙卡片（首页/列表共用）
+ * 以图为主、hover 显示题名/颁发单位
+ */
+import type { Honor } from '~/lib/types';
+import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+interface Props { honor: Honor; locale?: Locale }
+const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const h = Astro.props.honor;
+---
+
+<figure class="honor-card">
+  <div class="honor-card__frame">
+    {h.image
+      ? <img src={h.image} alt={t(h.title, locale)} loading="lazy" class="honor-card__img" />
+      : <div class="honor-card__fallback">岭南所</div>}
+  </div>
+  <figcaption class="honor-card__cap">
+    <span class="honor-card__cat">{t(h.category, locale)}</span>
+    <span class="honor-card__date">{h.date.slice(0, 7)}</span>
+  </figcaption>
+  <div class="honor-card__hover">
+    <h4 class="honor-card__title">{t(h.title, locale)}</h4>
+    <p class="honor-card__issuer">{t(h.issuer, locale)}</p>
+  </div>
+</figure>
+
+<style>
+  .honor-card {
+    position: relative; margin: 0;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--bg);
+    border: 1px solid var(--rule-soft);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+    cursor: zoom-in;
+  }
+  .honor-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--seal);
+    box-shadow: 0 18px 40px -20px rgba(0, 0, 0, 0.25);
+  }
+  .honor-card__frame {
+    width: 100%; height: 100%;
+    display: grid; place-items: center;
+    background: var(--bg-2);
+    overflow: hidden;
+  }
+  .honor-card__img {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    transition: transform 0.6s cubic-bezier(.2,.7,.2,1), filter 0.4s ease;
+  }
+  .honor-card:hover .honor-card__img { transform: scale(1.04); filter: brightness(0.55); }
+
+  .honor-card__fallback {
+    font-family: var(--serif-zh); font-weight: 500; font-size: 28px;
+    color: var(--ink-soft);
+  }
+
+  .honor-card__cap {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, transparent 0%, rgba(10,8,6,0.55) 100%);
+    color: var(--bg);
+    font-size: 11px; letter-spacing: 0.16em;
+    pointer-events: none;
+  }
+  .honor-card__cat { text-transform: uppercase; font-family: var(--serif-en); }
+  .honor-card__date { font-family: var(--serif-en); }
+
+  .honor-card__hover {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 22px 20px;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    color: var(--bg);
+    background: linear-gradient(180deg, rgba(10,8,6,0) 30%, rgba(10,8,6,0.85) 100%);
+    pointer-events: none;
+  }
+  .honor-card:hover .honor-card__hover { opacity: 1; }
+  .honor-card__title {
+    margin: 0 0 6px; font-size: 15px; font-weight: 500;
+    line-height: 1.4; font-family: var(--serif-zh);
+    letter-spacing: 0.02em;
+  }
+  .honor-card__issuer {
+    margin: 0; font-size: 12px; color: rgba(245, 240, 230, 0.75);
+    font-family: var(--serif-zh); line-height: 1.5;
+  }
+</style>

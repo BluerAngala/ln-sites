@@ -49,8 +49,14 @@ export interface CaseItem extends BaseContent {
   industry: I18n<string>;
   client?: I18n<string>;
   year: number;
-  summary: I18n<string>;
-  content: I18n<string>;
+  /** 客户背景 / 案情梗概：律师介入前是什么情况 */
+  background: I18n<string>;
+  /** 律师团队提供的服务 / 介入动作 */
+  approach: I18n<string>;
+  /** 最终结果 / 客户收获 */
+  result: I18n<string>;
+  summary?: I18n<string>;
+  content?: I18n<string>;
   highlights?: I18n<string[]>;
   leadLawyerId?: string;
   lawyerIds?: string[];
@@ -71,6 +77,8 @@ export interface NewsItem extends BaseContent {
   content: I18n<string>;
   cover?: string;
   author?: string;
+  /** 外部原文链接（如广州律协通知），存在时卡片直接跳转 */
+  sourceUrl?: string;
   isFeatured?: boolean;
   status: NewsStatus;
 }
@@ -107,6 +115,13 @@ export interface Office extends BaseContent {
   description?: I18n<string>;
   isHeadquarters?: boolean;
   order?: number;
+  image?: string;
+  lng?: number;
+  lat?: number;
+  mapUrl?: string;
+  mapEmbedUrl?: string;
+  mapAmap?: string;
+  mapBaidu?: string;
 }
 
 /* ---------- Social ---------- */

@@ -5,9 +5,14 @@ import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
 interface Props { news: NewsItem; locale?: Locale; showCover?: boolean }
 const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
 const n = Astro.props.news;
+const isExternal = !!n.sourceUrl;
+const href = isExternal ? n.sourceUrl! : `${locale === 'en' ? '/en' : ''}/news/${n.slug}`;
+const ctaText = isExternal
+  ? (t({ zh: '查看原文 →', en: 'Read Original →' }, locale))
+  : (t({ zh: '阅读全文 →', en: 'Read More →' }, locale));
 ---
 
-<a class="news-card-link" href={`${locale === 'en' ? '/en' : ''}/news/${n.slug}`}>
+<a class="news-card-link" href={href} target={isExternal ? '_blank' : undefined} rel={isExternal ? 'noopener noreferrer' : undefined}>
   <article class="news-card card">
     {Astro.props.showCover && n.cover && (
       <div class="news-card__cover">
@@ -20,7 +25,7 @@ const n = Astro.props.news;
     </div>
     <h3 class="card__title">{t(n.title, locale)}</h3>
     <p class="card__excerpt">{t(n.summary, locale)}</p>
-    <div class="card__cta">阅读全文 <span class="arrow">→</span></div>
+    <div class:list={['card__cta', isExternal && 'card__cta--block']}>{ctaText}</div>
   </article>
 </a>
 

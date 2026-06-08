@@ -7,63 +7,171 @@ import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
 const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
 const config = await getSiteConfig();
 const offices = await getOffices();
+const hq = offices.find(o => o.isHeadquarters);
+const branches = offices.filter(o => !o.isHeadquarters);
 ---
 
-<BaseLayout title={t({ zh: '关于岭南', en: 'About' }, locale)}>
+<BaseLayout title={t({ zh: '关于我们', en: 'About' }, locale)}>
   <PageHero
-    eyebrow={t({ zh: 'About · 所况', en: 'About · The Firm' }, locale)}
+    eyebrow={t({ zh: 'About · 我们', en: 'About · The Firm' }, locale)}
     title={t({ zh: '四十载岭南，<br/>一所而百年心。', en: 'Forty Years of Lingnan.<br/>A Century of Vision.' }, locale)}
     lede={t({ zh: '立足粤港澳大湾区，深耕商法四十年。', en: 'Rooted in the Greater Bay Area. Dedicated to commercial law for four decades.' }, locale)}
   />
 
-  <section class="section">
+  {/* ========== 律所介绍 ========== */}
+  <section class="section--tight" style="padding-top: 0;">
     <div class="container">
-      <div class="prose" set:html={t(config.aboutBody, locale) ?? ''}></div>
+      <div class="about-prose prose" set:html={t(config.aboutBody, locale) ?? ''}></div>
     </div>
   </section>
 
-  <div class="divider" aria-hidden="true">✦ {t({ zh: '所训 · 所风', en: 'Motto · Spirit' }, locale)} ✦</div>
-
-  <section class="section--tight">
+  {/* ========== 所训 / 所风（去掉装饰小标） ========== */}
+  <section class="section--tight" style="background: var(--bg-2);">
     <div class="container">
-      <div class="grid grid--2" style="gap: clamp(40px, 6vw, 100px);">
-        <div>
+      <div class="about-virtues">
+        <div class="about-virtue">
           <span class="eyebrow eyebrow-rule eyebrow-rule--seal">{t({ zh: '所训', en: 'Motto' }, locale)}</span>
-          <blockquote class="quote-block" style="padding: 32px 0 0; text-align: left;">
-            <p class="quote-block__text" style="margin: 0;">{t(config.tagline, locale)}</p>
-            <footer class="quote-block__attr">— {t(config.taglineAttr, locale)}</footer>
+          <blockquote class="about-virtue__quote">
+            <p>{t(config.tagline, locale)}</p>
+            <footer>— {t(config.taglineAttr, locale)}</footer>
           </blockquote>
         </div>
-        <div>
+        <div class="about-virtue">
           <span class="eyebrow eyebrow-rule">{t({ zh: '所风', en: 'Spirit' }, locale)}</span>
-          <blockquote class="quote-block" style="padding: 32px 0 0; text-align: left;">
-            <p class="quote-block__text" style="margin: 0;">{t(config.tagline2, locale)}</p>
-            <footer class="quote-block__attr">— {t(config.tagline2Attr, locale)}</footer>
+          <blockquote class="about-virtue__quote">
+            <p>{t(config.tagline2, locale)}</p>
+            <footer>— {t(config.tagline2Attr, locale)}</footer>
           </blockquote>
         </div>
       </div>
     </div>
   </section>
 
-  <div class="divider" aria-hidden="true">✦ {t({ zh: '办公室', en: 'Offices' }, locale)} ✦</div>
+  {/* ========== 办公室 ========== */}
+  {hq && (
+    <section class="section--tight" style="padding-top: 0;">
+      <div class="container">
+        <header class="section-header section-header--center">
+          <span class="eyebrow eyebrow-rule eyebrow-rule--seal section-header__eyebrow">{t({ zh: '总所 · Headquarters', en: 'Headquarters' }, locale)}</span>
+          <h2 class="h2 section-header__title">{t(hq.city, locale)}</h2>
+          <p class="section-header__subtitle">{t(hq.address, locale)}</p>
+        </header>
 
-  <section class="section--tight">
-    <div class="container">
-      <div class="grid grid--3">
-        {offices.map(o => (
-          <article class="office-card card">
-            {o.isHeadquarters && <span class="tag tag--seal" style="margin-bottom: 8px;">{t({ zh: '总所', en: 'HQ' }, locale)}</span>}
-            <h3 class="card__title" style="margin-bottom: 4px;">{t(o.city, locale)}</h3>
-            <div class="card__eyebrow" style="margin-bottom: 16px;">{o.city.en ?? o.city.zh}</div>
-            <p class="card__excerpt">{t(o.address, locale)}</p>
-            <div style="font-size: 14px; color: var(--ink-soft); margin-top: 8px;">
-              <div>📞 <a href={`tel:${o.phone.replace(/\s/g, '')}`}>{o.phone}</a></div>
-              {o.email && <div>✉️ <a href={`mailto:${o.email}`}>{o.email}</a></div>}
+        <div class="office-row card">
+              <div class="office-row__info">
+                <h3 class="office-row__name">{t(hq.city, locale)}{t({ zh: '总所', en: ' Headquarters' }, locale)}</h3>
+                <p class="office-row__addr">{t(hq.address, locale)}</p>
+                <p class="office-row__line">
+                  <span class="office-row__label">{t({ zh: '电话', en: 'Tel' }, locale)}</span>
+                  <a href={`tel:${hq.phone.replace(/[^\d+]/g, '')}`}>{hq.phone}</a>
+                </p>
+                {hq.email && (
+                  <p class="office-row__line">
+                    <span class="office-row__label">{t({ zh: '邮箱', en: 'Email' }, locale)}</span>
+                    <a href={`mailto:${hq.email}`}>{hq.email}</a>
+                  </p>
+                )}
+              </div>
+          {hq.mapEmbedUrl && (
+            <div class="office-row__map">
+              <iframe
+                src={hq.mapEmbedUrl}
+                title={t(hq.city, locale) ?? ''}
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                allowfullscreen
+              ></iframe>
             </div>
-            {o.description && <p class="card__excerpt" style="margin-top: 12px; font-size: 13px;">{t(o.description, locale)}</p>}
-          </article>
-        ))}
+          )}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {branches.length > 0 && (
+    <section class="section" style="background: var(--bg-2);">
+      <div class="container">
+        <header class="section-header section-header--center">
+          <span class="eyebrow eyebrow-rule eyebrow-rule--seal section-header__eyebrow">{t({ zh: '分所 · Branches', en: 'Branches' }, locale)}</span>
+          <h2 class="h2 section-header__title">{t({ zh: '六城协同', en: 'Six Cities' }, locale)}</h2>
+          <p class="section-header__subtitle">{t({ zh: '深圳 · 海口 · 东莞 · 惠州 · 佛山 · 花都', en: 'Shenzhen · Haikou · Dongguan · Huizhou · Foshan · Huadu' }, locale)}</p>
+        </header>
+
+        <div class="office-list">
+          {branches.map(o => (
+            <div class="office-row card">
+              <div class="office-row__info">
+                <h3 class="office-row__name">{t(o.city, locale)}{t({ zh: '分所', en: ' Branch' }, locale)}</h3>
+                <p class="office-row__addr">{t(o.address, locale)}</p>
+                <p class="office-row__line">
+                  <span class="office-row__label">{t({ zh: '电话', en: 'Tel' }, locale)}</span>
+                  <a href={`tel:${o.phone.replace(/[^\d+]/g, '')}`}>{o.phone}</a>
+                </p>
+              </div>
+              {o.mapEmbedUrl && (
+                <div class="office-row__map">
+                  <iframe
+                    src={o.mapEmbedUrl}
+                    title={t(o.city, locale) ?? ''}
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen
+                  ></iframe>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ========== CTA ========== */}
+  <section class="section--ink section" style="text-align: center; padding: clamp(60px, 10vw, 120px) var(--pad-x);">
+    <div class="container" style="max-width: 720px;">
+      <h2 class="h2" style="margin: 0 0 16px; font-size: clamp(28px, 4vw, 48px); white-space: nowrap;">{t({ zh: '就近委托，本地办理。', en: 'Local Engagement, Local Delivery.' }, locale)}</h2>
+      <p style="color: rgba(245,240,230,0.7); margin-bottom: 40px; font-size: 18px; line-height: 1.8;">{t({ zh: '任何分所均可受理跨区域委托。', en: 'Any branch can handle cross-regional matters.' }, locale)}</p>
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="/contact" class="btn btn--seal">{t({ zh: '发起委托', en: 'Engage Us' }, locale)} →</a>
+        <a href="tel:020-81836088" class="btn btn--ghost" style="color: var(--bg); border-color: rgba(245,240,230,0.5);">020-81836088</a>
       </div>
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  /* 律所介绍 — 加大字号 */
+  .about-prose { max-width: 860px; margin: 0 auto; font-size: 20px; line-height: 1.95; color: var(--ink); font-family: var(--serif-zh); }
+  :global(html[lang="en"]) .about-prose { font-family: var(--serif-en); font-size: 19px; line-height: 1.8; }
+  .about-prose :global(p) { margin: 0 0 1.3em; }
+  .about-prose :global(strong) { color: var(--seal); font-weight: 600; }
+
+  /* 所训 / 所风 */
+  .about-virtues { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px, 6vw, 100px); }
+  @media (max-width: 800px) { .about-virtues { grid-template-columns: 1fr; gap: 56px; } }
+  .about-virtue { display: flex; flex-direction: column; gap: 24px; }
+  .about-virtue__quote { margin: 0; padding: 0; }
+  .about-virtue__quote p { font-family: var(--serif-zh); font-weight: 200; font-size: clamp(26px, 3vw, 40px); line-height: 1.5; color: var(--ink); margin: 0; letter-spacing: 0.02em; }
+  :global(html[lang="en"]) .about-virtue__quote p { font-family: var(--serif-en); font-size: clamp(22px, 2.5vw, 32px); }
+  .about-virtue__quote footer { margin-top: 24px; font-size: 14px; color: var(--ink-soft); letter-spacing: 0.06em; }
+
+  /* 总所 / 分所 — 统一横向行卡（信息 + 地图） */
+  .office-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 0; margin-top: 32px; overflow: hidden; }
+  @media (max-width: 800px) { .office-row { grid-template-columns: 1fr; } }
+  .office-row__info { padding: 36px 40px; display: flex; flex-direction: column; gap: 14px; background: var(--bg); }
+  .office-row__name { font-family: var(--serif-zh); font-weight: 400; font-size: 28px; line-height: 1.2; margin: 0; color: var(--ink); }
+  .office-row__addr { font-size: 15px; line-height: 1.7; color: var(--ink-soft); margin: 0; font-family: var(--serif-zh); }
+  .office-row__line { margin: 0; font-size: 14px; color: var(--ink); display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+  .office-row__label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); min-width: 3em; }
+  .office-row__line a { color: var(--ink); text-decoration: none; font-family: var(--serif-en); }
+  .office-row__line a:hover { color: var(--seal); }
+  .office-row__map { background: var(--bg-2); min-height: 360px; }
+  .office-row__map iframe { width: 100%; height: 100%; min-height: 360px; border: 0; display: block; }
+
+  /* 分所 — 2 列网格 */
+  .office-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 32px; align-items: stretch; }
+  @media (max-width: 900px) { .office-list { grid-template-columns: 1fr; } }
+  .office-list .office-row { margin-top: 0; grid-template-columns: 1fr; }
+  .office-list .office-row__map { min-height: 240px; }
+  .office-list .office-row__map iframe { min-height: 240px; }
+</style>

@@ -15,6 +15,67 @@ const items = await getSocial();
     lede={t({ zh: '积极承担社会责任，热心公益事业。', en: 'Actively embracing social responsibility and public welfare.' }, locale)}
   />
 
+  {/* ========== 党建组织架构 ========== */}
+  <section class="section--tight" id="dj-structure" style="padding-top: 0;">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="eyebrow eyebrow-rule eyebrow-rule--seal section-header__eyebrow">{t({ zh: '组织架构', en: 'Structure' }, locale)}</span>
+        <h2 class="h2 section-header__title">{t({ zh: '党建引领，<br/>凝心聚力。', en: 'Party-Building Leads.<br/>Hearts Aligned.' }, locale)}</h2>
+        <p class="section-header__subtitle">{t({ zh: '中共广东岭南律师事务所总支部委员会', en: 'General Branch Committee of CPC Lingnan Counsel & Attorneys at Law' }, locale)}</p>
+      </header>
+
+      <div class="org-tree">
+        {/* 总支委员会 — 顶层 */}
+        <div class="org-node org-node--top">
+          <div class="org-node__chip">①</div>
+          <div class="org-node__body">
+            <h3 class="org-node__title">{t({ zh: '党总支委员会', en: 'General Branch Committee' }, locale)}</h3>
+            <p class="org-node__sub">{t({ zh: '负责全所党建工作总体规划与重大事项决策', en: 'Oversees firm-wide party-building strategy and major decisions' }, locale)}</p>
+          </div>
+        </div>
+
+        {/* 三条分支 — 纪检 / 党支部 / 团支部 */}
+        <div class="org-branches">
+          <div class="org-node">
+            <div class="org-node__chip">②</div>
+            <div class="org-node__body">
+              <h4 class="org-node__title">{t({ zh: '纪检委员', en: 'Discipline Committee' }, locale)}</h4>
+              <p class="org-node__sub">{t({ zh: '负责党风党纪、廉政建设与执业监督', en: 'Party discipline, integrity, and practice oversight' }, locale)}</p>
+            </div>
+          </div>
+
+          <div class="org-node">
+            <div class="org-node__chip">③</div>
+            <div class="org-node__body">
+              <h4 class="org-node__title">{t({ zh: '党支部', en: 'Party Branch' }, locale)}</h4>
+              <p class="org-node__sub">{t({ zh: '组织党员教育、管理与服务，推进党建业务融合', en: 'Education, management, and service for party members' }, locale)}</p>
+            </div>
+          </div>
+
+          <div class="org-node">
+            <div class="org-node__chip">④</div>
+            <div class="org-node__body">
+              <h4 class="org-node__title">{t({ zh: '团支部', en: 'Youth League Branch' }, locale)}</h4>
+              <p class="org-node__sub">{t({ zh: '团结青年律师，开展岗位建功与志愿服务', en: 'Unites young attorneys for service and volunteering' }, locale)}</p>
+            </div>
+          </div>
+        </div>
+
+        <p class="org-note">{t({ zh: '具体任职人员按所内规则不公开披露。', en: 'Specific personnel are not publicly disclosed per firm policy.' }, locale)}</p>
+      </div>
+    </div>
+  </section>
+
+  {/* ========== 公益活动 ========== */}
+  <section class="section" id="public-welfare" style="background: var(--bg-2);">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="eyebrow eyebrow-rule eyebrow-rule--seal section-header__eyebrow">{t({ zh: '公益活动', en: 'Activities' }, locale)}</span>
+        <h2 class="h2 section-header__title">{t({ zh: '所内动态 · 公益足迹', en: 'Firm Activities · Public Footprints' }, locale)}</h2>
+      </header>
+    </div>
+  </section>
+
   <section class="section--tight" style="padding-top: 0;">
     <div class="container">
       {items.length === 0 ? (
@@ -40,4 +101,30 @@ const items = await getSocial();
 
 <style>
   .social-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: var(--gutter); }
+
+  /* 党建组织架构 */
+  .org-tree { margin-top: 48px; display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .org-node { display: flex; gap: 24px; padding: 28px 32px; background: var(--bg); border: 1px solid var(--rule); width: 100%; max-width: 720px; align-items: center; position: relative; }
+  .org-node--top { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .org-node--top .org-node__title { color: var(--bg); }
+  .org-node--top .org-node__sub { color: rgba(245, 240, 230, 0.7); }
+  .org-node--top::after { content: ""; position: absolute; left: 50%; bottom: -28px; transform: translateX(-50%); width: 1px; height: 28px; background: var(--rule); }
+  .org-node__chip { display: grid; place-items: center; width: 48px; height: 48px; min-width: 48px; border-radius: 50%; border: 1.5px solid var(--seal); color: var(--seal); font-family: var(--serif-en); font-size: 18px; font-weight: 500; }
+  .org-node--top .org-node__chip { background: var(--seal); color: var(--bg); border-color: var(--seal); }
+  .org-node__body { flex: 1; min-width: 0; }
+  .org-node__title { font-family: var(--serif-zh); font-weight: 500; font-size: 22px; margin: 0 0 4px; color: var(--ink); }
+  .org-node__sub { font-size: 14px; color: var(--ink-soft); margin: 0; line-height: 1.6; }
+  :global(html[lang="en"]) .org-node__title { font-family: var(--serif-en); font-weight: 500; font-size: 18px; }
+  :global(html[lang="en"]) .org-node__sub { font-family: var(--serif-en); }
+
+  .org-branches { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; width: 100%; max-width: 960px; position: relative; }
+  .org-branches::before { content: ""; position: absolute; left: 50%; top: -28px; transform: translateX(-50%); width: calc(100% - 96px); max-width: 768px; height: 1px; background: var(--rule); }
+  .org-branches::after { content: ""; position: absolute; left: 50%; top: -28px; transform: translateX(-50%); width: 1px; height: 28px; background: var(--rule); }
+  .org-branches .org-node { flex-direction: column; align-items: center; text-align: center; padding: 32px 24px; gap: 16px; }
+  .org-branches .org-node__body { display: flex; flex-direction: column; gap: 4px; }
+  .org-branches .org-node__title { font-size: 18px; }
+  .org-branches .org-node__sub { font-size: 13px; }
+  @media (max-width: 800px) { .org-branches { grid-template-columns: 1fr; gap: 16px; } .org-branches::before, .org-branches::after { display: none; } }
+
+  .org-note { margin-top: 40px; font-size: 13px; color: var(--ink-soft); font-style: italic; }
 </style>

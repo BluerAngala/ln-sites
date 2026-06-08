@@ -35,12 +35,13 @@ type Str = I18n<string>;
 
 export const ui = {
   'nav.home':      { zh: '首页',       en: 'Home' },
-  'nav.about':     { zh: '关于岭南',   en: 'About' },
+  'nav.about':     { zh: '关于我们',   en: 'About' },
   'nav.practice':  { zh: '业务领域',   en: 'Practice' },
   'nav.team':      { zh: '专业人员',   en: 'Counsel' },
   'nav.cases':     { zh: '业绩案例',   en: 'Works' },
   'nav.news':      { zh: '新闻动态',   en: 'News' },
   'nav.honors':    { zh: '荣誉奖项',   en: 'Honors' },
+  'nav.offices':   { zh: '办公室',     en: 'Offices' },
   'nav.social':    { zh: '党建公益',   en: 'Public' },
   'nav.contact':   { zh: '委托咨询',   en: 'Contact' },
 

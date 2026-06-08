@@ -22,7 +22,7 @@ const email = config.contactEmail;
   <div class="footer__inner">
     <div class="footer__top">
       <div>
-        <div class="footer__brand">岭南律师事务所</div>
+        <div class="footer__brand">广东岭南律师事务所</div>
         <div class="footer__branden">Lingnan · Counsel &amp; Attorneys at Law</div>
         <p class="footer__lead">{ut('footer.lead', locale)}</p>
       </div>
@@ -59,8 +59,8 @@ const email = config.contactEmail;
     </div>
 
     <div class="footer__bottom">
-      <span>{copyright}</span>
-      <span>{config.icpNo}</span>
+      <span>{copyright} <span style="opacity: 0.7; margin-left: 12px;">· 由陈恒律师独立开发与维护</span></span>
+      <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{config.icpNo}</a>
     </div>
   </div>
 </footer>

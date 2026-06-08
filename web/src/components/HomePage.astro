@@ -9,8 +9,10 @@ import StatBar from '~/components/StatBar.astro';
 import LawyerCarousel from '~/components/LawyerCarousel.astro';
 import CaseCard from '~/components/CaseCard.astro';
 import NewsCard from '~/components/NewsCard.astro';
+import HonorWall from '~/components/HonorWall.astro';
+import SectionHeader from '~/components/SectionHeader.astro';
 import {
-  getLawyers, getFeaturedCases, getLatestNews, getPractices, getSiteConfig,
+  getLawyers, getFeaturedCases, getLatestNews, getPractices, getHonors, getSiteConfig,
 } from '~/lib/content';
 import { t, type Locale } from '~/i18n';
 
@@ -18,11 +20,12 @@ interface Props { locale: Locale }
 const locale = Astro.props.locale;
 
 const config = await getSiteConfig();
-const [lawyers, cases, news, practices] = await Promise.all([
+const [lawyers, cases, news, practices, honors] = await Promise.all([
   getLawyers(),
-  getFeaturedCases(3),
-  getLatestNews(3),
+  getFeaturedCases(6),
+  getLatestNews(6),
   getPractices(),
+  getHonors(),
 ]);
 ---
 
@@ -30,6 +33,7 @@ const [lawyers, cases, news, practices] = await Promise.all([
   <div class="hero__bg" aria-hidden="true">
     <img src="/img/hero/hero-team.jpg" alt="" class="hero__img" />
     <div class="hero__overlay"></div>
+    <div class="hero__spotlight" data-hero-spotlight></div>
   </div>
   <div class="hero__inner">
     <div class="hero__kicker">
@@ -43,14 +47,16 @@ const [lawyers, cases, news, practices] = await Promise.all([
     </h1>
     <p class="hero__lede" set:html={(t(config.heroLede, locale) ?? '').replace(/\n/g, '<br/>')}></p>
     <div class="hero__cta">
-      <a href={`${locale === 'en' ? '/en' : ''}/contact`} class="hero__btn hero__btn--primary">
+      <a href={`${locale === 'en' ? '/en' : ''}/about`} class="hero__btn hero__btn--primary">
+        {t({ zh: '走进岭南', en: 'About Us' }, locale)} <span class="arrow">→</span>
+      </a>
+      <a href={`${locale === 'en' ? '/en' : ''}/contact`} class="hero__btn hero__btn--ghost">
         {t({ zh: '委托咨询', en: 'Engage Us' }, locale)} <span class="arrow">→</span>
       </a>
-      <a href={`${locale === 'en' ? '/en' : ''}/about`} class="hero__btn hero__btn--ghost">{t({ zh: '走进岭南 / About Us', en: 'Learn More' }, locale)}</a>
     </div>
     <a href="#stats" class="hero__scroll" aria-label="Scroll">
       <span>SCROLL</span>
-      <svg width="12" height="20" viewBox="0 0 12 20" fill="none">
+      <svg viewBox="0 0 12 20" fill="none">
         <rect x="0.5" y="0.5" width="11" height="19" rx="5.5" stroke="currentColor" stroke-opacity="0.6"/>
         <circle cx="6" cy="6" r="1.5" fill="currentColor">
           <animate attributeName="cy" values="6;14;6" dur="2s" repeatCount="indefinite"/>
@@ -64,20 +70,28 @@ const [lawyers, cases, news, practices] = await Promise.all([
 
 <section class="section about-section">
   <div class="container">
-    <div class="grid grid--2 about-grid">
+    <div class="about-header">
+      <SectionHeader
+        eyebrow={{ zh: '关于', en: 'About' }}
+        title={{ zh: '四十载深耕，专业铸就信赖。', en: 'Forty Years of Practice. A Century of Trust.' }}
+        align="center"
+        locale={locale}
+      />
+    </div>
+    <div class="grid about-grid">
       <div class="about-visual">
         <img src="/img/hero/hero-books.jpg" alt="Justice" class="about-visual__img" />
         <div class="about-visual__caption">Justice · Equity · Trust</div>
       </div>
       <div class="about-content">
-        <span class="eyebrow eyebrow-rule eyebrow-rule--seal">About</span>
-        <h2 class="h2" style="margin-top: 16px;">{t({ zh: '四十载深耕，专业铸就信赖。', en: 'Forty Years of Practice. A Century of Trust.' }, locale)}</h2>
         <blockquote class="about-quote">
           <p>{t(config.aboutQuote, locale)}</p>
           <footer>— {t(config.aboutQuoteAttr, locale)}</footer>
         </blockquote>
         <div class="prose" set:html={t(config.aboutBody, locale) ?? ''}></div>
-        <a href={`${locale === 'en' ? '/en' : ''}/about`} class="btn btn--ghost" style="margin-top: 24px;">{t({ zh: '了解更多', en: 'Learn More' }, locale)} →</a>
+        <div style="text-align: right; margin-top: 32px;">
+          <a href={`${locale === 'en' ? '/en' : ''}/about`} class="btn btn--ghost">{t({ zh: '了解更多', en: 'Learn More' }, locale)} →</a>
+        </div>
       </div>
     </div>
   </div>
@@ -85,60 +99,73 @@ const [lawyers, cases, news, practices] = await Promise.all([
 
 <section class="section--tight practices-section">
   <div class="container">
-    <div style="text-align: center; margin-bottom: 80px;">
-      <span class="eyebrow eyebrow-rule eyebrow-rule--seal">{t({ zh: '业务领域', en: 'Practices' }, locale)}</span>
-      <h2 class="h2" style="margin: 24px 0 16px;">{t({ zh: '八大方舟，一以贯之', en: 'Eight Pillars. One Standard.' }, locale)}</h2>
-      <p class="lede muted" style="max-width: 640px; margin: 0 auto;">{t({ zh: '专注于法律服务的精进与创新，持续完善多元业务体系，为客户提供前沿、专业的法律解决方案。', en: 'Focused on the refinement and innovation of legal services, we continuously improve our multi-disciplinary practice to deliver forward-looking and professional solutions.' }, locale)}</p>
+    <div style="text-align: center;">
+      <SectionHeader
+        eyebrow={{ zh: '业务领域', en: 'Practices' }}
+        title={{ zh: '八大方舟，一以贯之', en: 'Eight Pillars. One Standard.' }}
+        align="center"
+        locale={locale}
+      />
+      <p class="lede muted" style="max-width: 640px; margin: 0 auto;">{t({ zh: '专注于法律服务的精进与创新，持续完善多元业务体系。', en: 'Focused on the refinement and innovation of legal services, we continuously improve our multi-disciplinary practice.' }, locale)}</p>
+      <p class="lede muted" style="max-width: 640px; margin: 12px auto 0;">{t({ zh: '为客户提供前沿、专业的法律解决方案。', en: 'To deliver forward-looking and professional solutions to every client.' }, locale)}</p>
     </div>
-    <div class="grid grid--4">
+    <div class="practices-grid">
       {practices.map((p, i) => (
         <a href={`${locale === 'en' ? '/en' : ''}/practice#${p.id}`} class="practice-card" data-idx={i + 1}>
-          <div class="practice-card__num">{String(i + 1).padStart(2, '0')}</div>
-          <div class="practice-card__name">{t(p.name, locale)}</div>
-          <div class="practice-card__nameEn">{p.nameEn}</div>
-          <p class="practice-card__desc">{t(p.description, locale)}</p>
+          <div class="practice-card__main">
+            <div class="practice-card__head">
+              <div class="practice-card__num">{String(i + 1).padStart(2, '0')}</div>
+              <h3 class="practice-card__name">{t(p.name, locale)}</h3>
+            </div>
+            <p class="practice-card__nameEn">{p.nameEn}</p>
+            <p class="practice-card__desc">{t(p.description, locale)}</p>
+          </div>
           {p.caseCount != null && (
             <div class="practice-card__count">
-              <span><strong>{p.caseCount}</strong><em>+</em> {t({ zh: '案例', en: 'Cases' }, locale)}</span>
+              <span class="practice-card__count-num">{p.caseCount}</span>
+              <span class="practice-card__count-label">+ {t({ zh: '案例', en: 'Cases' }, locale)}</span>
             </div>
           )}
-          <div class="practice-card__arrow">→</div>
         </a>
       ))}
     </div>
   </div>
 </section>
 
-<section class="section--ink" style="padding: clamp(60px, 8vw, 120px) 0;">
+<section class="section--tight" style="padding: clamp(40px, 5vw, 80px) 0 0;">
   <LawyerCarousel
     lawyers={lawyers}
-    title={t({ zh: '执业律师', en: 'Attorneys at Law' }, locale)}
-    eyebrow={t({ zh: 'Counsel · 专业人员', en: 'Counsel' }, locale)}
-    lede={t({ zh: '汇聚精英团队，注重专业与协作并进。', en: 'A team of senior practitioners combining deep insight with collective wisdom.' }, locale)}
+    title={{ zh: '执业律师', en: 'Attorneys at Law' }}
+    eyebrow={{ zh: '专业人员', en: 'Counsel' }}
+    lede={{ zh: '汇聚精英团队，注重专业与协作并进。', en: 'A team of senior practitioners combining deep insight with collective wisdom.' }}
     locale={locale}
   />
 </section>
 
 <section class="section">
   <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 24px; margin-bottom: 60px;">
-      <div>
-        <span class="eyebrow eyebrow-rule eyebrow-rule--seal">{t({ zh: '业绩', en: 'Works' }, locale)}</span>
-        <h2 class="h2" style="margin: 24px 0 0;">{t({ zh: '近期代表性案例', en: 'Selected Representations' }, locale)}</h2>
-      </div>
-      <a href={`${locale === 'en' ? '/en' : ''}/cases`} class="btn btn--ghost">{t({ zh: '全部案例', en: 'All Works' }, locale)} →</a>
+    <SectionHeader
+      eyebrow={{ zh: '荣誉', en: 'Honors' }}
+      title={{ zh: '荣誉与资质', en: 'Honors & Credentials' }}
+      align="center"
+      locale={locale}
+    />
+    <div style="text-align: right; margin-bottom: 32px;">
+      <a href={`${locale === 'en' ? '/en' : ''}/honors`} class="btn btn--ghost">{t({ zh: '全部荣誉', en: 'All Honors' }, locale)} →</a>
     </div>
-    <div class="grid grid--3">{cases.map(c => <CaseCard case={c} locale={locale} />)}</div>
+    <HonorWall honors={honors} locale={locale} />
   </div>
 </section>
 
 <section class="section" style="background: var(--bg-2);">
   <div class="container">
-    <div style="display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 24px; margin-bottom: 60px;">
-      <div>
-        <span class="eyebrow eyebrow-rule">{t({ zh: '资讯', en: 'Insight' }, locale)}</span>
-        <h2 class="h2" style="margin: 24px 0 0;">{t({ zh: '所内动态 · 行业观察', en: 'Firm News & Industry View' }, locale)}</h2>
-      </div>
+    <SectionHeader
+      eyebrow={{ zh: '资讯', en: 'Insight' }}
+      title={{ zh: '所内动态 · 行业观察', en: 'Firm News & Industry View' }}
+      align="center"
+      locale={locale}
+    />
+    <div style="text-align: right; margin-bottom: 40px;">
       <a href={`${locale === 'en' ? '/en' : ''}/news`} class="btn btn--ghost">{t({ zh: '全部资讯', en: 'All News' }, locale)} →</a>
     </div>
     <div class="grid grid--3">{news.map(n => <NewsCard news={n} locale={locale} />)}</div>
@@ -147,8 +174,8 @@ const [lawyers, cases, news, practices] = await Promise.all([
 
 <section class="section--ink section" style="text-align: center; padding: clamp(80px, 12vw, 160px) var(--pad-x);">
   <div class="container" style="max-width: 720px;">
-    <h2 class="h2" style="margin: 0 0 16px;">{t(config.tagline, locale)}</h2>
-    <p class="lede" style="color: rgba(245,240,230,0.7); margin-bottom: 40px;">{t(config.tagline2, locale)}</p>
+    <h2 class="h2" style="margin: 0 0 16px; font-size: clamp(28px, 4vw, 48px); white-space: nowrap;">{t(config.tagline, locale)}</h2>
+    <p style="color: rgba(245,240,230,0.7); margin-bottom: 40px; font-size: 20px; line-height: 1.8;">{t(config.tagline2, locale)}</p>
     <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
       <a href={`${locale === 'en' ? '/en' : ''}/contact`} class="btn btn--seal">{t({ zh: '发起委托', en: 'Engage Us' }, locale)} →</a>
       <a href={`tel:${config.contactPhone.replace(/\s/g, '')}`} class="btn btn--ghost" style="color: var(--bg); border-color: rgba(245,240,230,0.5);">{config.contactPhone}</a>
@@ -157,48 +184,134 @@ const [lawyers, cases, news, practices] = await Promise.all([
 </section>
 
 <style>
-  .hero { position: relative; min-height: 92vh; overflow: hidden; display: flex; align-items: center; padding: 120px var(--pad-x) 80px; }
+  .hero { position: relative; min-height: 100vh; overflow: hidden; display: flex; align-items: center; padding: 80px var(--pad-x) 120px; --mx: 50%; --my: 35%; }
   .hero__bg { position: absolute; inset: 0; z-index: 0; }
-  .hero__img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
-  .hero__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.55) 100%), radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%); }
-  .hero__inner { position: relative; z-index: 1; max-width: var(--max); margin: 0 auto; width: 100%; color: var(--bg); text-align: center; display: flex; flex-direction: column; align-items: center; }
-  .hero__kicker { display: inline-flex; align-items: center; gap: 16px; font-family: var(--serif-en); font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(245, 240, 230, 0.75); margin-bottom: 32px; padding: 8px 24px; border: 1px solid rgba(245, 240, 230, 0.25); border-radius: 999px; }
-  .hero__title { margin: 0 0 24px; }
-  .hero__title-zh { display: block; font-family: var(--serif-zh); font-weight: 200; font-size: clamp(40px, 6vw, 80px); line-height: 1.1; letter-spacing: 0.04em; color: var(--bg); }
-  :global(html[lang="en"]) .hero__title-zh { font-family: var(--serif-en); font-weight: 300; font-style: italic; }
-  .hero__title-en { display: block; font-family: var(--serif-en); font-style: italic; font-weight: 300; font-size: clamp(14px, 1.6vw, 20px); letter-spacing: 0.16em; color: rgba(245, 240, 230, 0.7); margin-top: 12px; }
-  .hero__lede { max-width: 640px; font-size: 17px; line-height: 1.95; color: rgba(245, 240, 230, 0.85); font-weight: 300; margin: 0 0 40px; }
-  .hero__cta { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-  .hero__btn { display: inline-flex; align-items: center; gap: 10px; padding: 16px 32px; font-family: var(--serif-zh); font-size: 15px; font-weight: 500; letter-spacing: 0.08em; border-radius: 2px; transition: all 0.3s; }
-  .hero__btn--primary { background: var(--bg); color: var(--ink); }
-  .hero__btn--primary:hover { background: var(--seal); color: var(--bg); }
-  .hero__btn--ghost { background: transparent; color: var(--bg); border: 1px solid rgba(245, 240, 230, 0.5); }
-  .hero__btn--ghost:hover { background: rgba(245, 240, 230, 0.1); border-color: var(--bg); }
-  .hero__scroll { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; color: rgba(245, 240, 230, 0.6); font-family: var(--serif-en); font-size: 10px; letter-spacing: 0.3em; transition: color 0.3s; }
+  .hero__img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; filter: brightness(0.78) saturate(0.95); }
+  .hero__overlay { position: absolute; inset: 0; background:
+    linear-gradient(180deg, rgba(10,8,6,0.35) 0%, rgba(10,8,6,0.2) 30%, rgba(10,8,6,0.55) 100%),
+    radial-gradient(ellipse 80% 85% at center 45%, rgba(10,8,6,0.18) 0%, rgba(10,8,6,0.5) 100%);
+  }
+  .hero__spotlight { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; background: radial-gradient(circle 480px at var(--mx) var(--my), transparent 0%, transparent 22%, rgba(10,8,6,0.5) 100%); }
+  @media (hover: hover) { .hero:hover .hero__spotlight { opacity: 1; } }
+  .hero__inner { position: relative; z-index: 1; max-width: var(--max); margin: 0 auto; width: 100%; color: var(--bg); text-align: center; display: flex; flex-direction: column; align-items: center; text-shadow: 0 2px 18px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.4); }
+  .hero__kicker { display: inline-flex; align-items: center; gap: 16px; font-family: var(--serif-en); font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase; color: rgba(245, 240, 230, 0.9); margin-bottom: 24px; padding: 8px 24px; border: 1px solid rgba(245, 240, 230, 0.4); border-radius: 999px; }
+  .hero__title { margin: 0 0 16px; }
+  .hero__title-zh { display: block; font-family: var(--serif-zh); font-weight: 500; font-size: clamp(36px, 5.4vw, 68px); line-height: 1.1; letter-spacing: 0.04em; color: var(--bg); }
+  :global(html[lang="en"]) .hero__title-zh { font-family: var(--serif-en); font-weight: 400; font-style: italic; }
+  .hero__title-en { display: block; font-family: var(--serif-en); font-style: italic; font-weight: 300; font-size: clamp(14px, 1.6vw, 20px); letter-spacing: 0.16em; color: rgba(245, 240, 230, 0.85); margin-top: 8px; }
+  .hero__lede { max-width: 640px; font-size: 16px; line-height: 1.8; color: rgba(245, 240, 230, 0.95); font-weight: 400; margin: 0 0 16px; }
+  .hero__cta { display: flex; gap: 64px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+  .hero__btn {
+    position: relative; display: inline-flex; align-items: center; gap: 12px;
+    padding: 18px 34px; font-family: var(--serif-zh); font-size: 15px; font-weight: 500;
+    letter-spacing: 0.12em; border-radius: 2px; transition: all 0.3s; text-decoration: none;
+  }
+  .hero__btn .arrow { transition: transform 0.3s ease; display: inline-block; }
+  .hero__btn:hover .arrow { transform: translateX(4px); }
+
+  /* 印章风主按钮：seal 红 + 内框白线，hover 时内框向内收紧（按印感） */
+  .hero__btn--primary { background: var(--seal); color: var(--bg); border: 1px solid var(--seal); }
+  .hero__btn--primary::before {
+    content: ""; position: absolute; inset: 5px;
+    border: 1px solid rgba(245, 240, 230, 0.55);
+    pointer-events: none; transition: inset 0.3s ease, border-color 0.3s ease;
+  }
+  .hero__btn--primary:hover { background: var(--seal-deep); transform: translateY(-1px); }
+  .hero__btn--primary:hover::before { inset: 7px; border-color: rgba(245, 240, 230, 0.8); }
+
+  /* 次按钮：hairline 极简 */
+  .hero__btn--ghost {
+    background: transparent; color: var(--bg);
+    border: 1px solid rgba(245, 240, 230, 0.5);
+  }
+  .hero__btn--ghost:hover {
+    background: rgba(245, 240, 230, 0.08);
+    border-color: var(--bg);
+  }
+
+  .hero__scroll {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    z-index: 3;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    color: rgba(245, 240, 230, 0.9); font-family: var(--serif-en); font-size: 12px;
+    letter-spacing: 0.36em; transition: color 0.3s;
+  }
+  .hero__scroll svg { opacity: 0.9; transition: opacity 0.3s; width: 18px; height: 32px; }
+  .hero__scroll:hover { color: var(--bg); }
+  .hero__scroll:hover svg { opacity: 1; }
   .hero__scroll:hover { color: var(--bg); }
   @media (max-width: 700px) { .hero { min-height: 80vh; } }
 
-  .about-section { background: var(--bg-soft); }
-  .about-grid { gap: clamp(40px, 6vw, 100px); align-items: center; }
-  .about-visual { position: relative; aspect-ratio: 4/5; max-width: 480px; background: var(--bg-2); border-radius: 4px; overflow: hidden; }
+  .about-section { background: var(--bg-soft); padding-top: clamp(40px, 5vw, 72px); }
+  .about-header { margin-bottom: 56px; }
+  .about-grid { gap: clamp(40px, 6vw, 100px); align-items: center; grid-template-columns: 1fr 2fr; }
+  @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+  .about-visual { position: relative; aspect-ratio: 4/5; max-width: 380px; background: var(--bg-2); border-radius: 4px; overflow: hidden; }
   .about-visual__img { width: 100%; height: 100%; object-fit: cover; }
   .about-visual__caption { position: absolute; bottom: 20px; left: 20px; right: 20px; font-family: var(--serif-en); font-size: 12px; letter-spacing: 0.4em; color: var(--bg); text-transform: uppercase; text-align: center; mix-blend-mode: difference; opacity: 0.7; }
   .about-quote { margin: 24px 0 32px; padding: 0 0 0 24px; border-left: 2px solid var(--seal); font-family: var(--serif-en); font-style: italic; color: var(--ink-soft); }
   .about-quote p { font-size: 19px; line-height: 1.6; margin: 0 0 12px; }
   .about-quote footer { font-family: var(--serif-en); font-style: normal; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; }
 
-  .practice-card { position: relative; display: block; padding: 32px 0; border-top: 1px solid var(--rule); transition: all 0.3s; }
-  .practice-card:hover { border-top-color: var(--seal); padding-left: 12px; text-decoration: none; }
-  .practice-card__num { font-family: var(--serif-en); font-size: 11px; letter-spacing: 0.2em; color: var(--ink-soft); margin-bottom: 16px; }
-  .practice-card__name { font-family: var(--serif-zh); font-weight: 500; font-size: 22px; margin-bottom: 4px; }
-  :global(html[lang="en"]) .practice-card__name { font-family: var(--serif-en); font-weight: 400; }
-  .practice-card__nameEn { font-family: var(--serif-en); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 12px; }
-  .practice-card__desc { font-size: 13px; line-height: 1.7; color: var(--ink-soft); margin: 0 0 12px; }
-  .practice-card__count { font-family: var(--serif-en); color: var(--seal); font-size: 13px; }
-  .practice-card__count strong { font-size: 24px; font-weight: 300; margin-right: 4px; }
-  .practice-card__count em { font-style: normal; color: var(--ink-soft); }
-  .practice-card__arrow { position: absolute; right: 0; top: 32px; opacity: 0; transition: opacity 0.3s, transform 0.3s; font-size: 20px; color: var(--seal); }
-  .practice-card:hover .practice-card__arrow { opacity: 1; transform: translateX(4px); }
+  /* Practices — 杂志大卡：2 列 × 4 行；[大编号] [业务名+描述] [案例数大数字] */
+  .practices-grid { display: grid; grid-template-columns: repeat(2, 1fr); }
+  .practices-grid > .practice-card { border-top: 1px solid var(--rule); }
+  .practices-grid > .practice-card:nth-child(odd)  { border-right: 1px solid var(--rule); }
+  .practices-grid > .practice-card:nth-child(even) { border-right: 0; }
+  .practices-grid > .practice-card:nth-last-child(-n+2) { border-bottom: 1px solid var(--rule); }
+  @media (max-width: 900px) {
+    .practices-grid { grid-template-columns: 1fr; }
+    .practices-grid > .practice-card { border-right: 0 !important; }
+  }
+
+  .practice-card {
+    position: relative; display: grid;
+    grid-template-columns: 1fr 110px;
+    gap: 40px; align-items: center;
+    padding: 44px 40px; text-decoration: none; color: inherit;
+    transition: background 0.3s ease;
+  }
+  .practice-card:hover { background: var(--bg-2); }
+
+  .practice-card__main { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+  .practice-card__head { display: flex; align-items: center; gap: 18px; flex-wrap: nowrap; }
+  .practice-card__num {
+    font-family: var(--serif-en); font-size: 48px; font-weight: 200; line-height: 1;
+    color: var(--seal); opacity: 0.55; letter-spacing: -0.02em;
+    flex-shrink: 0;
+    transition: opacity 0.3s ease;
+  }
+  .practice-card:hover .practice-card__num { opacity: 1; }
+
+  .practice-card__name {
+    font-family: var(--serif-zh); font-weight: 500; font-size: 26px; line-height: 1.25;
+    margin: 0; letter-spacing: 0.01em;
+    text-wrap: balance;
+    min-width: 0; flex: 1;
+  }
+  :global(html[lang="en"]) .practice-card__name { font-family: var(--serif-en); font-weight: 400; font-size: 24px; }
+  .practice-card__nameEn {
+    font-family: var(--serif-en); font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--ink-soft); margin: -4px 0 0;
+  }
+  .practice-card__desc {
+    font-size: 14px; line-height: 1.85; color: var(--ink-soft); margin: 0;
+  }
+
+  .practice-card__count {
+    display: flex; flex-direction: column; align-items: flex-end;
+    font-family: var(--serif-en); gap: 10px;
+    text-align: right; align-self: center;
+  }
+  .practice-card__count-num {
+    font-size: 52px; font-weight: 200; line-height: 1;
+    color: var(--seal); letter-spacing: -0.02em;
+  }
+  .practice-card__count-label {
+    font-size: 16px; color: var(--ink);
+    font-weight: 500; letter-spacing: 0.12em;
+  }
 
   .section--ink .lawyer-tile { background: rgba(245, 240, 230, 0.05); border-color: rgba(245, 240, 230, 0.12); }
   .section--ink .lawyer-tile:hover { border-color: var(--bg); background: rgba(245, 240, 230, 0.08); }
@@ -217,3 +330,20 @@ const [lawyers, cases, news, practices] = await Promise.all([
   .section--ink .lede { color: rgba(245, 240, 230, 0.7); }
   .section--ink .muted { color: rgba(245, 240, 230, 0.6); }
 </style>
+
+<script>
+  const hero = document.querySelector<HTMLElement>('.hero');
+  if (hero && window.matchMedia('(hover: hover)').matches) {
+    let raf = 0;
+    hero.addEventListener('mousemove', (e) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const r = hero.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width) * 100;
+        const y = ((e.clientY - r.top) / r.height) * 100;
+        hero.style.setProperty('--mx', x.toFixed(2) + '%');
+        hero.style.setProperty('--my', y.toFixed(2) + '%');
+      });
+    });
+  }
+</script>

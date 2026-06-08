@@ -164,6 +164,13 @@ function mapOffice(rec: LarkRecord): Office {
     description: i18nStr(f.description, f.descriptionEn),
     isHeadquarters: !!f.isHeadquarters,
     order:       typeof f.order === 'number' ? f.order : 999,
+    image:       f.image as string | undefined,
+    lng:         typeof f.lng === 'number' ? f.lng : undefined,
+    lat:         typeof f.lat === 'number' ? f.lat : undefined,
+    mapUrl:      f.mapUrl as string | undefined,
+    mapEmbedUrl: f.mapEmbedUrl as string | undefined,
+    mapAmap:     f.mapAmap as string | undefined,
+    mapBaidu:    f.mapBaidu as string | undefined,
   };
 }
 
@@ -300,6 +307,7 @@ export async function getFeaturedCases(limit = 3): Promise<CaseItem[]> {
 
 export async function getNews(opts: { category?: string; featured?: boolean; limit?: number } = {}): Promise<NewsItem[]> {
   let list = (await getContent()).news.filter(n => n.status === 'published');
+  list = list.sort((a, b) => b.date.localeCompare(a.date));
   if (opts.category) list = list.filter(n => n.category.zh === opts.category || n.category.en === opts.category);
   if (opts.featured) list = list.filter(n => n.isFeatured);
   if (opts.limit) list = list.slice(0, opts.limit);

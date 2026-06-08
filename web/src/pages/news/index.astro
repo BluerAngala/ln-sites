@@ -24,14 +24,22 @@ const [first, ...rest] = allNews;
       ) : (
         <>
           {first && (
-            <a href={`/${locale}/news/${first.slug}`} class="news-feature card" style="margin-bottom: 60px;">
+            <a 
+              href={first.sourceUrl || `/${locale}/news/${first.slug}`} 
+              target={first.sourceUrl ? '_blank' : undefined}
+              rel={first.sourceUrl ? 'noopener noreferrer' : undefined}
+              class="news-feature card" 
+              style="margin-bottom: 60px;"
+            >
               <div class="news-feature__meta">
                 <span class="tag tag--seal">{t({ zh: '置顶', en: 'Featured' }, locale)} · {t(first.category, locale)}</span>
                 <span class="muted" style="font-family: var(--serif-en); font-size: 13px;">{first.date}</span>
               </div>
               <h2 class="card__title" style="font-size: 32px; margin-top: 16px;">{t(first.title, locale)}</h2>
               <p class="card__excerpt" style="font-size: 16px; max-width: 720px;">{t(first.summary, locale)}</p>
-              <div class="card__cta">{t({ zh: '阅读全文', en: 'Read More' }, locale)} →</div>
+              <div class:list={['card__cta', first.sourceUrl && 'card__cta--block']} style={first.sourceUrl ? 'margin: 24px -48px -48px; padding: 18px 48px; text-align: right;' : ''}>
+                {first.sourceUrl ? t({ zh: '查看原文 →', en: 'Read Original →' }, locale) : t({ zh: '阅读全文 →', en: 'Read More →' }, locale)}
+              </div>
             </a>
           )}
 

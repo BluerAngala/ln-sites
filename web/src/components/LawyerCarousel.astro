@@ -1,28 +1,32 @@
 ---
-import type { Lawyer } from '~/lib/types';
+import type { Lawyer, I18n } from '~/lib/types';
 import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import SectionHeader from '~/components/SectionHeader.astro';
 
 interface Props {
   lawyers: Lawyer[];
-  title?: string;
-  eyebrow?: string;
-  lede?: string;
+  title?: I18n<string>;
+  eyebrow?: I18n<string>;
+  lede?: I18n<string>;
   locale?: Locale;
 }
 const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
-const { lawyers, title = 'Counsel', eyebrow = 'Counsel · 专业人员', lede = '' } = Astro.props;
+const {
+  lawyers,
+  title   = { zh: '执业律师',    en: 'Attorneys at Law' },
+  eyebrow = { zh: '专业人员',    en: 'Counsel' },
+  lede,
+} = Astro.props;
+const ledeText = lede ? (t(lede, locale) ?? '') : '';
 const prefix = locale === 'en' ? '/en' : '';
 ---
 
 <section class="lawyer-carousel" id="counsel">
   <div class="container">
-    <header class="lc__head">
-      <div>
-        <span class="eyebrow eyebrow-rule">{eyebrow}</span>
-        <h2 class="lc__title">{title}</h2>
-        {lede && <p class="lc__lede">{lede}</p>}
-      </div>
-    </header>
+    <div class="lc__head">
+      <SectionHeader eyebrow={eyebrow} title={title} align="center" locale={locale} />
+      {ledeText && <p class="lc__lede">{ledeText}</p>}
+    </div>
 
     <div class="lc__viewport">
       <ul class="lc__track">
@@ -39,18 +43,20 @@ const prefix = locale === 'en' ? '/en' : '';
                 </figcaption>
               </figure>
               <div class="lp__caption">
-                <h3 class="lp__name">
-                  <span class="lp__name-zh">{t(l.name, locale)}</span>
-                  {locale === 'en' && <span class="lp__name-en">{l.name.zh}</span>}
-                </h3>
-                <div class="lp__level">{t(l.level, locale)}</div>
-                <div class="lp__areas">
-                  {ta(l.practiceAreas, locale).slice(0, 2).map(area => <span class="lp__area">{area}</span>)}
+                <div class="lp__info">
+                  <h3 class="lp__name">
+                    <span class="lp__name-zh">{t(l.name, locale)}</span>
+                    {locale === 'en' && <span class="lp__name-en">{l.name.zh}</span>}
+                  </h3>
+                  <div class="lp__level">{t(l.level, locale)}</div>
+                  <div class="lp__areas">
+                    {ta(l.practiceAreas, locale).slice(0, 2).map(area => <span class="lp__area">{area}</span>)}
+                  </div>
                 </div>
-                <div class="lp__view">
-                  <span class="lp__view-zh">{locale === 'en' ? 'View Profile' : '查看简介'}</span>
-                  <span class="lp__view-arrow" aria-hidden="true">→</span>
-                </div>
+                <span class="lp__cta">
+                  <span class="lp__cta-zh">{locale === 'en' ? 'View Profile' : '查看简介'}</span>
+                  <span class="lp__cta-arrow" aria-hidden="true">→</span>
+                </span>
               </div>
             </a>
           </li>
@@ -58,48 +64,17 @@ const prefix = locale === 'en' ? '/en' : '';
       </ul>
     </div>
 
-    <div class="lc__controls">
-      <div class="lc__progress" role="presentation">
-        <span class="lc__progress-bar"></span>
-      </div>
-      <div class="lc__nav" role="group" aria-label="Carousel">
-        <button class="lc__btn lc__btn--prev" aria-label="Previous" type="button">‹</button>
-        <button class="lc__btn lc__btn--pause" aria-label="Pause" type="button">
-          <span class="lc__pause-icon" data-icon="pause" aria-hidden="true"></span>
-        </button>
-        <button class="lc__btn lc__btn--next" aria-label="Next" type="button">›</button>
-      </div>
-    </div>
   </div>
 </section>
 
 <style>
-  .lawyer-carousel { padding: clamp(80px, 10vw, 140px) var(--pad-x); background: var(--bg); }
-  .lc__head { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 56px; }
-  .lc__head > div { width: 100%; }
-  .lc__title { font-family: var(--serif-zh); font-weight: 200; font-size: clamp(36px, 5vw, 64px); line-height: 1.1; letter-spacing: 0.02em; margin: 20px 0 0; color: var(--ink); }
-  .lc__lede { font-size: 16px; line-height: 1.8; color: var(--ink-soft); margin: 16px 0 0; max-width: 560px; }
-
-  /* 下方控制器:进度条 + 居中 nav 按钮 */
-  .lc__controls { display: flex; flex-direction: column; align-items: center; gap: 24px; margin-top: 56px; }
-  .lc__progress { width: 200px; height: 1px; background: var(--rule-soft); position: relative; overflow: hidden; }
-  .lc__progress-bar { position: absolute; left: 0; top: 0; height: 100%; background: var(--ink); width: 0%; }
-  .lc__nav { display: flex; gap: 12px; }
-  .lc__btn { width: 48px; height: 48px; background: transparent; border: 1px solid var(--ink); border-radius: 50%; font-size: 22px; line-height: 1; color: var(--ink); transition: all 0.25s; display: grid; place-items: center; cursor: pointer; font-family: var(--serif-en); padding: 0; }
-  .lc__btn:hover { background: var(--ink); color: var(--bg); transform: scale(1.05); }
-  .lc__btn:disabled { opacity: 0.25; cursor: not-allowed; }
-  .lc__btn:disabled:hover { background: transparent; color: var(--ink); transform: none; }
-  .lc__pause-icon { display: block; width: 14px; height: 14px; position: relative; }
-  .lc__pause-icon::before, .lc__pause-icon::after { content: ""; position: absolute; top: 0; width: 3px; height: 100%; background: currentColor; }
-  .lc__pause-icon::before { left: 2px; }
-  .lc__pause-icon::after  { right: 2px; }
-  .lc__pause-icon[data-icon="play"] { width: 0; height: 0; }
-  .lc__pause-icon[data-icon="play"]::before { left: 0; top: -7px; width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 11px; border-color: transparent transparent transparent currentColor; background: transparent; }
-  .lc__pause-icon[data-icon="play"]::after  { display: none; }
+  .lawyer-carousel { padding: clamp(56px, 7vw, 96px) 0 clamp(72px, 9vw, 120px); background: var(--bg-soft); }
+  .lc__head { margin-bottom: 24px; text-align: center; }
+  .lc__lede { font-size: 16px; line-height: 1.8; color: var(--ink-soft); margin: 0 auto 48px; max-width: 560px; }
 
   /* Viewport + track */
   .lc__viewport { overflow: hidden; margin: 0 calc(var(--pad-x) * -1); padding: 0 var(--pad-x); }
-  .lc__track { display: flex; gap: 32px; transition: transform 0.45s cubic-bezier(.2,.7,.2,1); will-change: transform; list-style: none; margin: 0; padding: 0; }
+  .lc__track { display: flex; gap: 32px; will-change: transform; list-style: none; margin: 0; padding: 0; }
   .lc__slide { flex: 0 0 calc((100% - 64px) / 3); min-width: 0; }
   @media (max-width: 900px) { .lc__slide { flex: 0 0 calc((100% - 32px) / 2); } }
   @media (max-width: 600px) { .lc__slide { flex: 0 0 100%; } }
@@ -126,81 +101,90 @@ const prefix = locale === 'en' ? '/en' : '';
   .lp__photo-fallback span { font-family: var(--serif-zh); font-weight: 200; font-size: 96px; color: var(--ink-soft); }
 
   /* Caption block below photo */
-  .lp__caption { padding: 24px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .lp__caption {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 24px; align-items: end;
+    padding: 32px 0 0;
+  }
+  .lp__info { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
   .lp__name { margin: 0; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-  .lp__name-zh { font-family: var(--serif-zh); font-weight: 500; font-size: 22px; letter-spacing: 0.01em; color: var(--ink); line-height: 1.2; }
-  .lp__name-en { font-family: var(--serif-en); font-size: 12px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; }
-  .lp__level { font-size: 12px; color: var(--seal); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
-  .lp__areas { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-  .lp__area { font-size: 12px; color: var(--ink-soft); }
-  .lp__area:not(:last-child)::after { content: "·"; margin-left: 8px; color: var(--ink-soft); }
-  .lp__view { margin-top: 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); font-weight: 500; letter-spacing: 0.04em; opacity: 0.6; transition: opacity 0.3s, gap 0.3s; }
-  .lp:hover .lp__view { opacity: 1; gap: 14px; }
-  .lp__view-zh { font-family: var(--serif-zh); }
-  .lp__view-arrow { transition: transform 0.3s; }
-  .lp:hover .lp__view-arrow { transform: translateX(4px); }
+  .lp__name-zh { font-family: var(--serif-zh); font-weight: 500; font-size: 36px; letter-spacing: 0.01em; color: var(--ink); line-height: 1.2; }
+  .lp__name-en { font-family: var(--serif-en); font-size: 15px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; }
+  .lp__level { font-size: 16px; color: var(--seal); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+  .lp__areas { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+  .lp__area { font-size: 17px; color: var(--ink-soft); }
+  .lp__area:not(:last-child)::after { content: "·"; margin-left: 10px; color: var(--ink-soft); }
+
+  /* 查看简介按钮：seal 印章红 + 内框白线（与 hero 主按钮同款） */
+  .lp__cta {
+    position: relative; display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 24px;
+    background: var(--seal); color: var(--bg);
+    border: 1px solid var(--seal);
+    font-family: var(--serif-zh); font-size: 14px; font-weight: 500;
+    letter-spacing: 0.12em; white-space: nowrap;
+    transition: background 0.3s ease, transform 0.3s ease;
+  }
+  .lp__cta::before {
+    content: ""; position: absolute; inset: 4px;
+    border: 1px solid rgba(245, 240, 230, 0.55);
+    pointer-events: none; transition: inset 0.3s ease, border-color 0.3s ease;
+  }
+  .lp__cta-arrow { display: inline-block; transition: transform 0.3s ease; }
+  .lp:hover .lp__cta { background: var(--seal-deep); transform: translateY(-1px); }
+  .lp:hover .lp__cta::before { inset: 6px; border-color: rgba(245, 240, 230, 0.8); }
+  .lp:hover .lp__cta-arrow { transform: translateX(4px); }
 </style>
 
 <script>
-  // 轮播:prev/next 手动 + 6s 自动 + 进度条 + 暂停按钮
+  // 轮播：marquee 风格持续向左滚动 + 无限循环 + 仅在律师卡上悬停暂停
   const carousel = document.querySelector('.lawyer-carousel');
   if (carousel) {
     const track = carousel.querySelector('.lc__track') as HTMLElement | null;
-    const prev = carousel.querySelector('.lc__btn--prev') as HTMLButtonElement | null;
-    const next = carousel.querySelector('.lc__btn--next') as HTMLButtonElement | null;
-    const pause = carousel.querySelector('.lc__btn--pause') as HTMLButtonElement | null;
-    const pauseIcon = pause?.querySelector('.lc__pause-icon') as HTMLElement | null;
-    const bar = carousel.querySelector('.lc__progress-bar') as HTMLElement | null;
-    if (track && prev && next && pause && bar) {
-      const AUTO_MS = 2500;        // 2.5s 切换一次(兼顾阅读)
-      let auto = true;
-      let startedAt = performance.now();
-      const getStep = () => {
-        const slide = track.querySelector('.lc__slide') as HTMLElement | null;
-        if (!slide) return 0;
-        const gap = parseFloat(getComputedStyle(track).gap) || 0;
-        return slide.offsetWidth + gap;
-      };
-      const getMaxIndex = () => Math.max(0, Math.ceil((track.scrollWidth - track.clientWidth) / getStep()));
-      const update = () => {
-        const step = getStep();
-        const offset = -index * step;
-        track.style.transform = `translateX(${offset}px)`;
-        prev.disabled = index <= 0;
-        next.disabled = index >= getMaxIndex();
-        startedAt = performance.now();
-        bar.style.width = '0%';
-      };
-      const go = (delta: number) => {
-        const maxIdx = getMaxIndex();
-        index = (index + delta + maxIdx + 1) % (maxIdx + 1);  // 循环到底后回到 0
-        update();
-      };
+    if (track) {
+      // 把原始一组 slides 复制一份拼到末尾，让视觉上"无限循环"
+      const originals = Array.from(track.children) as HTMLElement[];
+      originals.forEach(node => track.appendChild(node.cloneNode(true)));
+
+      const SPEED = 110;                 // px/s（更快的 marquee）
+      let offset = 0;                    // 当前 translateX
+      let auto = true;                   // 是否在滚动
+      let last = performance.now();
+
       const tick = (now: number) => {
+        const dt = now - last;
+        last = now;
         if (auto) {
-          const elapsed = now - startedAt;
-          const pct = Math.min(100, (elapsed / AUTO_MS) * 100);
-          bar.style.width = `${pct}%`;
-          if (elapsed >= AUTO_MS) go(1);
+          offset -= (SPEED * dt) / 1000;
+          const half = track.scrollWidth / 2;
+          // 走过一组 slides 长度后，瞬时"接回"开头（视觉无缝）
+          if (-offset >= half) offset += half;
+          track.style.transform = `translateX(${offset}px)`;
         }
         requestAnimationFrame(tick);
       };
-      prev.addEventListener('click', () => { if (index > 0) { go(-1); } });
-      next.addEventListener('click', () => { go(1); });
-      pause.addEventListener('click', () => {
-        auto = !auto;
-        pause.setAttribute('aria-label', auto ? 'Pause' : 'Play');
-        pauseIcon?.setAttribute('data-icon', auto ? 'pause' : 'play');
-        if (auto) startedAt = performance.now();
-        else bar.style.width = '0%';
+
+      // 鼠标仅在律师卡（.lp）上才暂停；离开律师卡即续播
+      const inCard = (target: EventTarget | null) =>
+        !!(target as HTMLElement | null)?.closest?.('.lp');
+
+      track.addEventListener('mouseover', (e) => {
+        if (inCard(e.target)) auto = false;
       });
-      // 切到隐藏标签页时暂停
+      track.addEventListener('mouseout', (e) => {
+        const leaving = inCard(e.target);
+        const enteringCard = inCard(e.relatedTarget);
+        if (leaving && !enteringCard) {
+          auto = true;
+          last = performance.now();
+        }
+      });
+
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden) { bar.style.width = '0%'; auto = false; pauseIcon?.setAttribute('data-icon', 'play'); }
-        else if (!auto) { auto = true; startedAt = performance.now(); pauseIcon?.setAttribute('data-icon', 'pause'); }
+        if (document.hidden) auto = false;
+        else { auto = true; last = performance.now(); }
       });
-      window.addEventListener('resize', update);
-      update();
+
       requestAnimationFrame(tick);
     }
   }
