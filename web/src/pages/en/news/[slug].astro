@@ -1,0 +1,51 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { getNews, getNewsBySlug } from '~/lib/content';
+import { t, type Locale } from '~/i18n';
+
+const locale: Locale = 'en';
+
+export async function getStaticPaths() {
+  const news = await getNews();
+  return news.map(n => ({ params: { slug: n.slug } }));
+}
+
+const { slug } = Astro.params;
+const n = await getNewsBySlug(slug!);
+if (!n) return Astro.redirect('/en/news/');
+---
+
+<BaseLayout title={t(n.title, locale) ?? ''} description={t(n.summary, locale)}>
+  <article class="news-detail">
+    <div class="container">
+      <a href="/en/news/" class="back-link">← Back to News</a>
+
+      <header style="margin-top: 32px; text-align: center; max-width: 760px; margin-left: auto; margin-right: auto;">
+        <div style="display: flex; gap: 12px; align-items: center; justify-content: center; margin-bottom: 16px;">
+          <span class="tag tag--ink">{t(n.category, locale)}</span>
+          <span class="muted" style="font-family: var(--serif-en); font-size: 13px; letter-spacing: 0.1em;">{n.date}</span>
+        </div>
+        <h1 class="h1" style="font-size: clamp(36px, 5vw, 56px); margin: 0 0 24px;">{t(n.title, locale)}</h1>
+        <p class="lede" style="color: var(--ink-soft);">{t(n.summary, locale)}</p>
+        {n.author && <div class="muted" style="margin-top: 16px; font-size: 13px;">By {n.author}</div>}
+      </header>
+
+      {n.cover && (
+        <div style="margin: 60px auto; max-width: 960px; border-radius: var(--radius); overflow: hidden; aspect-ratio: 16/9; background: var(--bg-2);">
+          <img src={n.cover} alt={t(n.title, locale) ?? ''} style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+      )}
+
+      <div class="prose" style="max-width: 720px; margin: 0 auto;" set:html={t(n.content, locale) ?? ''}></div>
+
+      <div style="text-align: center; margin-top: 80px; padding-top: 60px; border-top: 1px solid var(--rule-soft);">
+        <a href="/en/news/" class="btn btn--ghost">Back to News →</a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .back-link { color: var(--ink-soft); font-size: 14px; display: inline-block; margin-top: 100px; }
+  .back-link:hover { color: var(--ink); }
+</style>

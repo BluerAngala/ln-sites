@@ -1,0 +1,207 @@
+---
+import type { Lawyer } from '~/lib/types';
+import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+interface Props {
+  lawyers: Lawyer[];
+  title?: string;
+  eyebrow?: string;
+  lede?: string;
+  locale?: Locale;
+}
+const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const { lawyers, title = 'Counsel', eyebrow = 'Counsel · 专业人员', lede = '' } = Astro.props;
+const prefix = locale === 'en' ? '/en' : '';
+---
+
+<section class="lawyer-carousel" id="counsel">
+  <div class="container">
+    <header class="lc__head">
+      <div>
+        <span class="eyebrow eyebrow-rule">{eyebrow}</span>
+        <h2 class="lc__title">{title}</h2>
+        {lede && <p class="lc__lede">{lede}</p>}
+      </div>
+    </header>
+
+    <div class="lc__viewport">
+      <ul class="lc__track">
+        {lawyers.map(l => (
+          <li class="lc__slide">
+            <a class="lp" href={`${prefix}/team/${l.slug}`}>
+              <figure class="lp__photo">
+                {l.avatar
+                  ? <img src={l.avatar} alt={t(l.name, locale) ?? ''} loading="lazy" />
+                  : <div class="lp__photo-fallback"><span>{(t(l.name, locale) ?? '?').charAt(0)}</span></div>}
+                <span class="lp__photo-deco" aria-hidden="true"></span>
+                <figcaption class="lp__overlay">
+                  <span class="lp__office-tag">{t(l.office, locale)}</span>
+                </figcaption>
+              </figure>
+              <div class="lp__caption">
+                <h3 class="lp__name">
+                  <span class="lp__name-zh">{t(l.name, locale)}</span>
+                  {locale === 'en' && <span class="lp__name-en">{l.name.zh}</span>}
+                </h3>
+                <div class="lp__level">{t(l.level, locale)}</div>
+                <div class="lp__areas">
+                  {ta(l.practiceAreas, locale).slice(0, 2).map(area => <span class="lp__area">{area}</span>)}
+                </div>
+                <div class="lp__view">
+                  <span class="lp__view-zh">{locale === 'en' ? 'View Profile' : '查看简介'}</span>
+                  <span class="lp__view-arrow" aria-hidden="true">→</span>
+                </div>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="lc__controls">
+      <div class="lc__progress" role="presentation">
+        <span class="lc__progress-bar"></span>
+      </div>
+      <div class="lc__nav" role="group" aria-label="Carousel">
+        <button class="lc__btn lc__btn--prev" aria-label="Previous" type="button">‹</button>
+        <button class="lc__btn lc__btn--pause" aria-label="Pause" type="button">
+          <span class="lc__pause-icon" data-icon="pause" aria-hidden="true"></span>
+        </button>
+        <button class="lc__btn lc__btn--next" aria-label="Next" type="button">›</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lawyer-carousel { padding: clamp(80px, 10vw, 140px) var(--pad-x); background: var(--bg); }
+  .lc__head { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 56px; }
+  .lc__head > div { width: 100%; }
+  .lc__title { font-family: var(--serif-zh); font-weight: 200; font-size: clamp(36px, 5vw, 64px); line-height: 1.1; letter-spacing: 0.02em; margin: 20px 0 0; color: var(--ink); }
+  .lc__lede { font-size: 16px; line-height: 1.8; color: var(--ink-soft); margin: 16px 0 0; max-width: 560px; }
+
+  /* 下方控制器:进度条 + 居中 nav 按钮 */
+  .lc__controls { display: flex; flex-direction: column; align-items: center; gap: 24px; margin-top: 56px; }
+  .lc__progress { width: 200px; height: 1px; background: var(--rule-soft); position: relative; overflow: hidden; }
+  .lc__progress-bar { position: absolute; left: 0; top: 0; height: 100%; background: var(--ink); width: 0%; }
+  .lc__nav { display: flex; gap: 12px; }
+  .lc__btn { width: 48px; height: 48px; background: transparent; border: 1px solid var(--ink); border-radius: 50%; font-size: 22px; line-height: 1; color: var(--ink); transition: all 0.25s; display: grid; place-items: center; cursor: pointer; font-family: var(--serif-en); padding: 0; }
+  .lc__btn:hover { background: var(--ink); color: var(--bg); transform: scale(1.05); }
+  .lc__btn:disabled { opacity: 0.25; cursor: not-allowed; }
+  .lc__btn:disabled:hover { background: transparent; color: var(--ink); transform: none; }
+  .lc__pause-icon { display: block; width: 14px; height: 14px; position: relative; }
+  .lc__pause-icon::before, .lc__pause-icon::after { content: ""; position: absolute; top: 0; width: 3px; height: 100%; background: currentColor; }
+  .lc__pause-icon::before { left: 2px; }
+  .lc__pause-icon::after  { right: 2px; }
+  .lc__pause-icon[data-icon="play"] { width: 0; height: 0; }
+  .lc__pause-icon[data-icon="play"]::before { left: 0; top: -7px; width: 0; height: 0; border-style: solid; border-width: 7px 0 7px 11px; border-color: transparent transparent transparent currentColor; background: transparent; }
+  .lc__pause-icon[data-icon="play"]::after  { display: none; }
+
+  /* Viewport + track */
+  .lc__viewport { overflow: hidden; margin: 0 calc(var(--pad-x) * -1); padding: 0 var(--pad-x); }
+  .lc__track { display: flex; gap: 32px; transition: transform 0.45s cubic-bezier(.2,.7,.2,1); will-change: transform; list-style: none; margin: 0; padding: 0; }
+  .lc__slide { flex: 0 0 calc((100% - 64px) / 3); min-width: 0; }
+  @media (max-width: 900px) { .lc__slide { flex: 0 0 calc((100% - 32px) / 2); } }
+  @media (max-width: 600px) { .lc__slide { flex: 0 0 100%; } }
+
+  /* Card */
+  .lp { display: block; text-decoration: none; color: inherit; position: relative; }
+  .lp__photo { position: relative; margin: 0; aspect-ratio: 3 / 4; overflow: hidden; background: var(--bg-2); }
+  .lp__photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; transition: transform 0.8s cubic-bezier(.2,.7,.2,1), filter 0.5s; filter: grayscale(8%); }
+  .lp:hover .lp__photo img { transform: scale(1.04); filter: grayscale(0%); }
+
+  /* 装饰边框:右下角断线(签名感) */
+  .lp__photo-deco { position: absolute; right: 0; bottom: 0; width: 36px; height: 36px; pointer-events: none; }
+  .lp__photo-deco::before { content: ""; position: absolute; right: 16px; bottom: 16px; width: 12px; height: 1px; background: var(--bg); opacity: 0.6; }
+  .lp__photo-deco::after  { content: ""; position: absolute; right: 16px; bottom: 16px; width: 1px; height: 12px; background: var(--bg); opacity: 0.6; }
+
+  /* 顶部到中部渐变蒙版(让头像不抢眼 + office tag 可读) */
+  .lp__photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(0,0,0,0.55) 100%); pointer-events: none; }
+
+  /* 浮动 office 角标 */
+  .lp__overlay { position: absolute; left: 16px; top: 16px; margin: 0; }
+  .lp__office-tag { display: inline-block; padding: 5px 10px; background: var(--bg); color: var(--ink); font-size: 11px; letter-spacing: 0.12em; font-weight: 500; }
+
+  .lp__photo-fallback { width: 100%; height: 100%; display: grid; place-items: center; background: var(--bg-2); }
+  .lp__photo-fallback span { font-family: var(--serif-zh); font-weight: 200; font-size: 96px; color: var(--ink-soft); }
+
+  /* Caption block below photo */
+  .lp__caption { padding: 24px 0 0; display: flex; flex-direction: column; gap: 8px; }
+  .lp__name { margin: 0; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .lp__name-zh { font-family: var(--serif-zh); font-weight: 500; font-size: 22px; letter-spacing: 0.01em; color: var(--ink); line-height: 1.2; }
+  .lp__name-en { font-family: var(--serif-en); font-size: 12px; letter-spacing: 0.18em; color: var(--ink-soft); text-transform: uppercase; }
+  .lp__level { font-size: 12px; color: var(--seal); letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; }
+  .lp__areas { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+  .lp__area { font-size: 12px; color: var(--ink-soft); }
+  .lp__area:not(:last-child)::after { content: "·"; margin-left: 8px; color: var(--ink-soft); }
+  .lp__view { margin-top: 14px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); font-weight: 500; letter-spacing: 0.04em; opacity: 0.6; transition: opacity 0.3s, gap 0.3s; }
+  .lp:hover .lp__view { opacity: 1; gap: 14px; }
+  .lp__view-zh { font-family: var(--serif-zh); }
+  .lp__view-arrow { transition: transform 0.3s; }
+  .lp:hover .lp__view-arrow { transform: translateX(4px); }
+</style>
+
+<script>
+  // 轮播:prev/next 手动 + 6s 自动 + 进度条 + 暂停按钮
+  const carousel = document.querySelector('.lawyer-carousel');
+  if (carousel) {
+    const track = carousel.querySelector('.lc__track') as HTMLElement | null;
+    const prev = carousel.querySelector('.lc__btn--prev') as HTMLButtonElement | null;
+    const next = carousel.querySelector('.lc__btn--next') as HTMLButtonElement | null;
+    const pause = carousel.querySelector('.lc__btn--pause') as HTMLButtonElement | null;
+    const pauseIcon = pause?.querySelector('.lc__pause-icon') as HTMLElement | null;
+    const bar = carousel.querySelector('.lc__progress-bar') as HTMLElement | null;
+    if (track && prev && next && pause && bar) {
+      const AUTO_MS = 2500;        // 2.5s 切换一次(兼顾阅读)
+      let auto = true;
+      let startedAt = performance.now();
+      const getStep = () => {
+        const slide = track.querySelector('.lc__slide') as HTMLElement | null;
+        if (!slide) return 0;
+        const gap = parseFloat(getComputedStyle(track).gap) || 0;
+        return slide.offsetWidth + gap;
+      };
+      const getMaxIndex = () => Math.max(0, Math.ceil((track.scrollWidth - track.clientWidth) / getStep()));
+      const update = () => {
+        const step = getStep();
+        const offset = -index * step;
+        track.style.transform = `translateX(${offset}px)`;
+        prev.disabled = index <= 0;
+        next.disabled = index >= getMaxIndex();
+        startedAt = performance.now();
+        bar.style.width = '0%';
+      };
+      const go = (delta: number) => {
+        const maxIdx = getMaxIndex();
+        index = (index + delta + maxIdx + 1) % (maxIdx + 1);  // 循环到底后回到 0
+        update();
+      };
+      const tick = (now: number) => {
+        if (auto) {
+          const elapsed = now - startedAt;
+          const pct = Math.min(100, (elapsed / AUTO_MS) * 100);
+          bar.style.width = `${pct}%`;
+          if (elapsed >= AUTO_MS) go(1);
+        }
+        requestAnimationFrame(tick);
+      };
+      prev.addEventListener('click', () => { if (index > 0) { go(-1); } });
+      next.addEventListener('click', () => { go(1); });
+      pause.addEventListener('click', () => {
+        auto = !auto;
+        pause.setAttribute('aria-label', auto ? 'Pause' : 'Play');
+        pauseIcon?.setAttribute('data-icon', auto ? 'pause' : 'play');
+        if (auto) startedAt = performance.now();
+        else bar.style.width = '0%';
+      });
+      // 切到隐藏标签页时暂停
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) { bar.style.width = '0%'; auto = false; pauseIcon?.setAttribute('data-icon', 'play'); }
+        else if (!auto) { auto = true; startedAt = performance.now(); pauseIcon?.setAttribute('data-icon', 'pause'); }
+      });
+      window.addEventListener('resize', update);
+      update();
+      requestAnimationFrame(tick);
+    }
+  }
+</script>

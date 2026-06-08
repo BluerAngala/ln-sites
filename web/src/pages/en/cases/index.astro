@@ -1,0 +1,43 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import PageHero from '~/components/PageHero.astro';
+import CaseCard from '~/components/CaseCard.astro';
+import { getCases, getPractices } from '~/lib/content';
+import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+const locale: Locale = 'en' as const;
+const allCases = await getCases();
+const practices = await getPractices();
+const areas = Array.from(new Set(allCases.map(c => t(c.practiceArea, locale) ?? c.practiceArea.zh).filter(Boolean)));
+---
+
+<BaseLayout title={t({ zh: '业绩案例', en: 'Selected Works' }, locale)}>
+  <PageHero
+    eyebrow={t({ zh: 'Works · 业绩', en: 'Works' }, locale)}
+    title={t({ zh: '代表案例，<br/>以案观所。', en: 'Selected Representations.<br/>A View of the Firm.' }, locale)}
+    lede={t({ zh: '每一个案件都是一份责任的兑现。', en: 'Every matter is the discharge of a duty.' }, locale)}
+  />
+
+  <section class="section--tight" style="padding-top: 0;">
+    <div class="container">
+      {allCases.length === 0 ? (
+        <p class="muted" style="text-align: center; padding: 80px 0;">{t({ zh: '案例内容筹备中。', en: 'Content is being prepared.' }, locale)}</p>
+      ) : (
+        <>
+          {areas.length > 0 && (
+            <div class="case-filter" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px;">
+              <a href="#" class="tag tag--ink" style="text-decoration: none;">{t({ zh: '全部', en: 'All' }, locale)} ({allCases.length})</a>
+              {areas.map(a => {
+                const count = allCases.filter(c => (t(c.practiceArea, locale) ?? c.practiceArea.zh) === a).length;
+                return <a href={`#${a}`} class="tag" style="text-decoration: none;">{a} ({count})</a>;
+              })}
+            </div>
+          )}
+          <div class="grid grid--3">
+            {allCases.map(c => <CaseCard case={c} locale="en" />)}
+          </div>
+        </>
+      )}
+    </div>
+  </section>
+</BaseLayout>

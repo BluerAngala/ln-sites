@@ -1,0 +1,54 @@
+---
+/**
+ * 印章组件 - 复用首页核心视觉元素
+ * 用法：<Seal size="md" caption="岭南 · 印信" />
+ */
+interface Props {
+  size?: 'sm' | 'md' | 'lg';
+  caption?: string;
+  chars?: [string, string, string, string];
+}
+const { size = 'md', caption, chars = ['嶺', '南', '律', '師'] } = Astro.props;
+const dim = size === 'sm' ? 140 : size === 'lg' ? 280 : 200;
+const fontSize = size === 'sm' ? 24 : size === 'lg' ? 44 : 32;
+---
+
+<div class="seal" style={`--seal-size: ${dim}px; --seal-font: ${fontSize}px;`} role="img" aria-label={caption ?? '印章'}>
+  <div class="seal__body">
+    <div class="seal__inner">
+      <span>{chars[0]}</span>
+      <span>{chars[1]}</span>
+      <span>{chars[2]}</span>
+      <span>{chars[3]}</span>
+    </div>
+  </div>
+  {caption && <div class="seal__caption">{caption}</div>}
+</div>
+
+<style>
+  .seal { position: relative; display: inline-grid; place-items: center; }
+  .seal__body {
+    width: var(--seal-size); height: var(--seal-size);
+    background: var(--seal); color: var(--bg);
+    display: grid; place-items: center; position: relative;
+    box-shadow: var(--shadow-stamp);
+    transform: rotate(-3deg);
+    transition: transform 0.6s ease;
+  }
+  .seal__body::before {
+    content: ""; position: absolute; inset: calc(var(--seal-size) * 0.04);
+    border: 2px solid var(--bg); pointer-events: none;
+  }
+  .seal__inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--seal-size) * 0.04);
+    font-family: var(--serif-zh); font-weight: 700;
+    font-size: var(--seal-font); line-height: 1; letter-spacing: 0.05em; text-align: center;
+  }
+  .seal__caption {
+    position: absolute; bottom: calc(var(--seal-size) * -0.18);
+    left: 0; right: 0; text-align: center;
+    font-family: var(--serif-en); font-size: 11px; letter-spacing: 0.4em;
+    color: var(--ink-soft); text-transform: uppercase; white-space: nowrap;
+  }
+  .seal:hover .seal__body { transform: rotate(2deg) scale(1.04); }
+</style>

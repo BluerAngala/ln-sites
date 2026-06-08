@@ -1,0 +1,66 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import PageHero from '~/components/PageHero.astro';
+import { getHonors, getHonorsByCategory } from '~/lib/content';
+import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+const locale: Locale = 'en' as const;
+const honors = await getHonors();
+const byCategory = await getHonorsByCategory();
+const categories = Object.keys(byCategory);
+---
+
+<BaseLayout title={t({ zh: '荣誉奖项', en: 'Honors' }, locale)}>
+  <PageHero
+    eyebrow={t({ zh: 'Honors · 荣誉', en: 'Honors' }, locale)}
+    title={t({ zh: '为律师谋发展，<br/>为法治作贡献。', en: 'For Lawyers.<br/>For the Rule of Law.' }, locale)}
+    lede={t({ zh: '不断创新专业服务模式，勇于承担社会责任和行业责任。', en: 'Constantly innovating in professional service delivery, embracing social and industry responsibility.' }, locale)}
+  />
+
+  <section class="section--tight" style="padding-top: 0;">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 80px;">
+        <div class="hero__num" style="font-family: var(--serif-en); font-size: clamp(64px, 8vw, 120px); font-weight: 300; line-height: 1; color: var(--ink);">
+          {honors.length}<span style="color: var(--seal);">+</span>
+        </div>
+        <div class="lede muted" style="margin-top: 16px;">{t({ zh: '累计所获荣誉与榜单', en: 'Cumulative Honors & Rankings' }, locale)}</div>
+      </div>
+
+      {categories.map(cat => {
+        // cat 是中文分类名；用 list[0].category 取双语
+        const list = byCategory[cat];
+        const catDisplay = t(list[0].category, locale);
+        return (
+          <div class="honor-section" style="margin-bottom: 80px;">
+            <h2 class="eyebrow eyebrow-rule" style="font-size: 14px; margin-bottom: 32px;">{catDisplay}</h2>
+            <ul class="honor-list">
+              {list.map(h => (
+                <li class="honor-item">
+                  <div class="honor-item__year">{h.date.slice(0, 4)}<span>.{h.date.slice(5, 7)}</span></div>
+                  <div class="honor-item__body">
+                    <h3 class="honor-item__title">{t(h.title, locale)}</h3>
+                    <div class="honor-item__meta">
+                      <span>{t({ zh: '颁发', en: 'Issued by' }, locale)} · {t(h.issuer, locale)}</span>
+                      {h.ranking && <span class="tag tag--seal" style="margin-left: 8px;">{h.ranking}</span>}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        );
+      })}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .honor-list { display: flex; flex-direction: column; }
+  .honor-item { display: grid; grid-template-columns: 140px 1fr; gap: 32px; padding: 28px 0; border-bottom: 1px solid var(--rule-soft); }
+  .honor-item__year { font-family: var(--serif-en); font-size: 36px; font-weight: 300; line-height: 1; color: var(--ink); letter-spacing: -0.02em; }
+  .honor-item__year span { font-size: 0.6em; color: var(--ink-soft); margin-left: 2px; }
+  .honor-item__title { font-family: var(--serif-zh); font-weight: 500; font-size: 19px; margin: 0 0 6px; }
+  :global(html[lang="en"]) .honor-item__title { font-family: var(--serif-en); }
+  .honor-item__meta { font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; display: flex; align-items: center; flex-wrap: wrap; }
+  @media (max-width: 720px) { .honor-item { grid-template-columns: 1fr; gap: 12px; } }
+</style>

@@ -1,72 +1,144 @@
 # 岭南律师事务所 · 官网
 
-> 广东岭南律师事务所（Guangdong Lingnan Law Firm）官网静态站源码仓库。
-> 创立于 1984 年 / 1998 年（依站点不同），学院派综合性大所，公司商事、争议解决、知识产权、跨境投资、刑事辩护、资本市场等业务领域。
+> 广东岭南律师事务所（Guangdong Lingnan Law Firm）官网源码仓库。
+> 创立于 1984 年，学院派综合性大所，公司商事、争议解决、知识产权、跨境投资、刑事辩护、资本市场等业务领域。
 
-本仓库托管**两组备选官网设计稿**及对应的静态站源码，供内部评审、复用与部署。
+本仓库托管：
+
+1. **`web/`** — 选定的**正式版官网方案**（Astro 5 + 飞书多维表格 CMS）
+2. **`site/`** — 设计稿 A：墨分五色 / The Counsel / Lex A（备选）
+3. **`sites/`** — 设计稿 B：学院派（带深 / 浅 / 编辑三主题切换，备选）
+4. **`docs/`** — 飞书建表操作指南
 
 ---
 
-## 目录结构
+## 一、`web/` 官网主仓库
+
+技术栈：**Astro 5 静态站 + 飞书多维表格作 CMS**。
+
+- 视觉风格：复用 `site/01-lingnan-yin/` 的墨分五色 + 印章 + 大字
+- 内容管理：律师/助理在飞书多维表格里加案例、改数字，网站自动同步
+- **无需飞书凭证也能跑**（用本地 mock 兜底）
+- 部署支持：Vercel / Netlify / Cloudflare Pages / 任意静态托管
+- 完全开源（MIT 依赖）
+
+### 快速开始
+
+```bash
+cd web
+npm install
+cp .env.example .env       # 可选：填飞书凭证
+npm run dev                # http://localhost:4321
+```
+
+### 接入飞书
+
+1. 飞书开放平台建自建应用（5 分钟）
+2. 创建一个多维表格「岭南所官网内容库」，按 [docs/FEISHU_CMS.md](docs/FEISHU_CMS.md) 建 8 张表
+3. 复制 Base Token + 8 个 Table ID 到 `.env`
+4. 跑 `npm run lark:test` 验证连通
+5. 跑 `npm run build` 部署
+
+### 飞书建表操作指南
+
+→ [docs/FEISHU_CMS.md](docs/FEISHU_CMS.md)（**给运营/律师助理看的，零代码**）
+
+### 部署到 Vercel
+
+1. 仓库连到 Vercel
+2. **Root Directory** = `web`
+3. **Build Command** = `npm run build`
+4. **Output Directory** = `dist`
+5. 触发首次部署
+
+详细：[web/README.md](web/README.md)
+
+---
+
+## 二、设计稿（备选方案）
+
+> 这两组设计稿是评审期产出的备选方案，**不影响** `web/` 正式版。
+> 设计稿保留在这里作为视觉风格参考 / 备选 / 复用。
+
+### `site/` 设计稿 A：墨分五色（东方雅致）
+
+```
+site/
+├── 01-lingnan-yin/    方案 01 — 墨分五色，印信立言（已被 web/ 复用为视觉底版）
+├── 02-the-counsel/    方案 02 — The Counsel
+└── 03-lex-a/          方案 03 — Lex A
+```
+
+### `sites/` 设计稿 B：学院派（深 / 浅 / 编辑 三主题切换）
+
+```
+sites/
+├── A-campus/          方案 A — Campus（学院派）
+├── B-modern/          方案 B — Modern（现代派）
+└── C-editorial/       方案 C — Editorial（编辑设计）
+```
+
+---
+
+## 三、目录结构
 
 ```
 .
-├── site/                     # 设计稿 A：墨分五色（东方雅致）
-│   ├── 01-lingnan-yin/       #   方案 01 — 墨分五色，印信立言
-│   ├── 02-the-counsel/       #   方案 02 — The Counsel
-│   └── 03-lex-a/             #   方案 03 — Lex A
+├── web/                # ★ 官网主仓库（Astro + 飞书 CMS）
+├── docs/
+│   └── FEISHU_CMS.md   # 飞书建表操作指南
 │
-└── sites/                    # 设计稿 B：学院派（带深 / 浅主题切换）
-    ├── A-campus/             #   方案 A — Campus（学院派）
-    ├── B-modern/             #   方案 B — Modern（现代派）
-    └── C-editorial/          #   方案 C — Editorial（编辑设计）
+├── site/               # 设计稿 A：墨分五色（东方雅致）
+│   ├── 01-lingnan-yin/
+│   ├── 02-the-counsel/
+│   └── 03-lex-a/
+│
+└── sites/              # 设计稿 B：学院派
+    ├── A-campus/
+    ├── B-modern/
+    └── C-editorial/
 ```
 
-> ⚠️ 两组目录各自独立、各自完整，**互不依赖**。每个子目录都是一个可单独部署的静态站。
+---
+
+## 四、技术栈
+
+### `web/` 正式版
+
+- **Astro 5.x** 静态站生成器
+- **TypeScript** 全量类型
+- **飞书多维表格 REST API** 作为内容源
+- **本地 mock 兜底**（无凭证/CI/本地预览）
+- **RSS + Sitemap** 内置
+- 字体：Google Fonts（Fraunces / Noto Serif SC / Noto Sans SC / Cormorant）
+
+### `site/` `sites/` 设计稿
+
+- 纯静态 HTML 5 + 原生 CSS + 原生 JavaScript（ES6+）
+- 无构建步骤，不依赖 npm / Node / Webpack
+- 字体走 Google Fonts CDN
 
 ---
 
-## 技术栈
+## 五、本地预览
 
-- **纯静态**：HTML 5 + 原生 CSS + 原生 JavaScript（ES6+）
-- **无构建步骤**：不依赖 npm / Node / Webpack
-- **字体**：通过 Google Fonts 引入
-  - `site/`：Fraunces、Noto Serif SC、Noto Sans SC、Cormorant Garamond
-  - `sites/`：Cormorant Garamond、Noto Serif SC
-- **图标**：纯文本 / Unicode 符号
-- **依赖运行时**：现代浏览器（Chrome 90+ / Edge 90+ / Safari 14+ / Firefox 88+）
-
----
-
-## 本地预览
-
-无需安装任何依赖。任选一种方式：
-
-### 方式一：直接打开（最简单）
+### `web/` 主仓库
 
 ```bash
-# macOS
-open site/01-lingnan-yin/index.html
-
-# Windows
-start site\01-lingnan-yin\index.html
+cd web
+npm install
+npm run dev
+# → http://localhost:4321
 ```
 
-> ⚠️ 部分浏览器对 `file://` 协议下的 fetch / 字体加载有限制，复杂页面建议用方式二。
-
-### 方式二：本地起一个静态服务器（推荐）
-
-任选其一：
+### `site/` `sites/` 设计稿
 
 ```bash
 # Python 3
 python3 -m http.server 8000
 
-# Node.js（无需安装 npx 自带）
+# Node.js
 npx --yes serve .
-
-# PHP
-php -S localhost:8000
 ```
 
 然后浏览器访问：
@@ -76,64 +148,38 @@ php -S localhost:8000
 
 ---
 
-## 部署
+## 六、浏览器兼容性
 
-每个 `sites/*/` 目录都自带 `.netlify/netlify.toml`，可用 [Netlify](https://www.netlify.com/) 部署。
-
-### Netlify 部署步骤
-
-1. 把仓库连接到 Netlify（Netlify UI 或 `netlify init`）
-2. 在 Site settings → Build & deploy 设置：
-   - **Base directory**：选你要部署的子目录（如 `sites/A-campus`）
-   - **Build command**：留空
-   - **Publish directory**：留空（或填 `.`，因为 `netlify.toml` 已声明 `publish`）
-3. 触发部署
-
-> 📌 当前仓库里的 `netlify.toml` 是在本地 `netlify dev` 自动生成的，`publish` 字段是绝对路径，**首次部署前请改成相对路径**，例如：
->
-> ```toml
-> [build]
-> publish = "."
-> ```
-
-### 其他平台
-
-也可直接部署到 Vercel、Cloudflare Pages、GitHub Pages 等任意静态托管平台：
-
-- **Vercel / Cloudflare Pages**：在「Root Directory」里选对应子目录即可
-- **GitHub Pages**：把单一子目录作为仓库根目录推送，或配置 GitHub Actions 自动构建
+| 浏览器        | 最低版本 | `web/` | `site/` | `sites/` |
+| ------------- | -------- | ------ | ------- | -------- |
+| Chrome / Edge | 90+      | ✅     | ✅      | ✅       |
+| Safari        | 14+      | ✅     | ✅      | ✅       |
+| Firefox       | 88+      | ✅     | ✅      | ✅       |
+| IE            | ❌        | ❌      | ❌      | ❌        |
 
 ---
 
-## 浏览器兼容性
+## 七、开发约定
 
-| 浏览器        | 最低版本     | 备注                           |
-| ------------- | ------------ | ------------------------------ |
-| Chrome / Edge | 90+          | 推荐                           |
-| Safari        | 14+          | iOS 14+                        |
-| Firefox       | 88+          |                                |
-| IE            | ❌ 不支持     | 使用了 CSS 自定义属性、Grid 等 |
-
-`sites/*/` 自带「深色 / 浅色 / 编辑」主题切换（点击导航栏右侧 ○ 按钮），偏好会写入 `localStorage`。
-
----
-
-## 开发约定
-
-- **不动顶层结构**：`site/` 与 `sites/` 是两个独立的设计稿体系，新增方案请按 `site/NN-xxx/` 或 `sites/X-xxx/` 命名
-- **静态资源就近放置**：HTML、CSS、JS 各自放子目录的根或 `css/` `js/` 目录，不跨子目录共享
-- **字体走 Google Fonts CDN**：不下载到本地，避免许可证 / 体积问题
+- **不动顶层结构**：`web/` 是正式版，`site/` `sites/` 是设计稿，新增加内容请放 `web/src/`
+- **设计稿互不依赖**：`site/` 和 `sites/` 两组设计稿各自独立、各自完整
+- **字体走 Google Fonts CDN**
 - **图禁用图片优先**：能用 CSS / Unicode / SVG 实现的就不放位图
 - **不要提交**：
   - `.DS_Store`（已加 .gitignore）
-  - `.netlify/state.json`（已加 .gitignore，Netlify 本地运行时自动生成）
+  - `web/node_modules/`（已加 .gitignore）
+  - `web/.env`（已加 .gitignore，含飞书凭证）
+  - `web/.cache/`（飞书数据缓存）
+  - `web/dist/`（构建产物）
+  - `web/.astro/`（Astro 临时）
+  - `.netlify/state.json`（已加 .gitignore）
   - 个人编辑器配置（`.vscode/`、`.idea/` 已加 .gitignore）
 
 ---
 
-## 版权与许可
+## 八、版权与许可
 
-本站点（含文字、设计稿、HTML / CSS / JS 源码、静态资源等）的全部权利归属 **陈恒律师** 个人所有。
+本站点（含文字、设计稿、HTML / CSS / JS 源码、静态资源、文档等）的全部权利归属 **陈恒律师** 个人所有。
 未经权利人书面授权，请勿公开传播、转载、再发布或用于任何商业用途。
 
 如需使用源码、复用设计稿或对外展示，请先与权利人确认授权范围与方式。

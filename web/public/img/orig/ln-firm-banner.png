@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+ 
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>404-error</title>
+	 
+    <style>
+        body {
+            background-color:#dad6cb;
+            overflow:hidden;
+        }
+    </style>
+    <script src="Components/easyui/jquery.min.js"></script>
+	<script type="text/javascript" >
+	    var SysSecond;
+	    var InterValObj;
+	    $(document).ready(function () {
+	        SysSecond = parseInt($("#remainSeconds").html());
+	        InterValObj = window.setInterval(SetRemainTime, 1000);
+	    });
+	    function SetRemainTime() {
+	         
+	    }
+ 
+	    window.onload = function () {
+	        var bodyheight = $(window).height();
+	        var topheight = $("#error_content").height();
+	        topheight = bodyheight
+	        $("#error_content").css("height", topheight)
+	    }
+	</script>
+</head>
+<body>
+<div id="error_content">
+<div class="container-fluid">
+	<div class="row">
+	<div class="error_con" style="text-align:center;">
+			<div class="col-xs-12">
+				<p class="error_p1">
+					<a href="###"> <img src="areas/admin/img/404.png" class="img-responsive"></a>
+				</p>
+			</div>
+			<div class="col-xs-12">
+				<p class="error_p2">
+					你似乎来到了没有知识存在的荒原…
+				</p>
+			</div>
+			<div class="col-xs-12">
+				<div id="remainSeconds" style="display:none">3</div>
+				<p class="error_p3">
+					页面没有找到丢失了！
+				</p>
+			</div>
+            <div>
+                <a href="###" onclick="turnToDefault()">回到首页</a>
+                <a href="###" style="margin-left:40px;" onclick="window.history.back();">上一页</a>
+            </div>
+		</div>
+	</div>
+</div>
+</div>
+    <script>
+        function turnToDefault() {
+            var url = window.location.href.toLowerCase();
+            window.location.href = url.substr(0, url.lastIndexOf("/404.html"));
+        }
+
+    </script>
+</body>
+</html>

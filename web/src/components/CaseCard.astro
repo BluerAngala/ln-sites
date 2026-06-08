@@ -1,0 +1,38 @@
+---
+import type { CaseItem } from '~/lib/types';
+import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+interface Props { case: CaseItem; locale?: Locale }
+const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const c = Astro.props.case;
+---
+
+<a class="case-card-link" href={`${locale === 'en' ? '/en' : ''}/cases/${c.slug}`}>
+  <article class="case-card card">
+    <div class="case-card__meta">
+      <span class="tag tag--seal">{t(c.type, locale)}</span>
+      <span class="tag">{t(c.industry, locale)}</span>
+      <span class="tag">{c.year}</span>
+    </div>
+    <h3 class="case-card__title card__title">{t(c.title, locale)}</h3>
+    <p class="card__excerpt">{t(c.summary, locale)}</p>
+    {c.highlights && (c.highlights.zh?.length || c.highlights.en?.length) ? (
+      <div class="case-card__tags">
+        {ta(c.highlights, locale).slice(0, 3).map(h => <span class="tag">{h}</span>)}
+      </div>
+    ) : null}
+    <div class="card__cta">查看详情 <span class="arrow">→</span></div>
+  </article>
+</a>
+
+<style>
+  .case-card-link { display: block; height: 100%; }
+  .case-card-link:hover { text-decoration: none; }
+  /* 卡片等高：填满 grid 单元格，内部 flex column 让 CTA 沉底 */
+  .case-card { display: flex; flex-direction: column; height: 100%; }
+  .case-card__meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .case-card__title { margin: 0 0 12px; flex-shrink: 0; }
+  .card__excerpt { flex-grow: 1; }
+  .case-card__tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .card__cta { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule-soft); }
+</style>

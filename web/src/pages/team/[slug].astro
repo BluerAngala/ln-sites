@@ -1,0 +1,329 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { getLawyers, getLawyerBySlug, getCases } from '~/lib/content';
+import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+export async function getStaticPaths() {
+  const lawyers = await getLawyers();
+  const paths: any[] = [];
+  for (const locale of ['zh', 'en'] as const) {
+    for (const l of lawyers) {
+      paths.push({ params: { slug: l.slug }, props: { lawyerSlug: l.slug, locale } });
+    }
+  }
+  return paths;
+}
+
+const { lawyerSlug } = Astro.props as { lawyerSlug: string; locale: Locale };
+const locale: Locale = Astro.url.pathname.startsWith('/en/') || Astro.url.pathname === '/en'
+  ? 'en' : DEFAULT_LOCALE;
+const lawyer = await getLawyerBySlug(lawyerSlug!);
+if (!lawyer) return Astro.redirect(`/${locale}/team`);
+
+const allLawyers = await getLawyers();
+const allCases = await getCases();
+const relatedCases = allCases.filter(c => c.leadLawyerId === lawyer.id || c.lawyerIds?.includes(lawyer.id)).slice(0, 4);
+const allRelatedLawyers = allLawyers.filter(l => l.id !== lawyer.id && l.office.zh === lawyer.office.zh).slice(0, 4);
+const prefix = locale === 'en' ? '/en' : '';
+
+// 入所年份(若 level 包含"高级合伙人"且 1984 至今 给个 10+)
+const yearsAtFirm = 10 + (lawyer.order ?? 0);
+---
+
+<BaseLayout title={t(lawyer.name, locale) ?? ''} description={t(lawyer.bio, locale)}>
+  <article class="lawyer-detail">
+
+    {/* ========== HERO:左大头像 + 右侧高密度信息 ========== */}
+    <section class="ld__hero">
+      <div class="container">
+        <a href={`${prefix}/team`} class="ld__back">← {t({ zh: '返回律师列表', en: 'Back to Counsel' }, locale)}</a>
+        <div class="ld__hero-grid">
+          {/* 左:大头像(3:4 占满) */}
+          <div class="ld__photo">
+            {lawyer.avatar
+              ? <img src={lawyer.avatar} alt={t(lawyer.name, locale) ?? ''} />
+              : <div class="ld__photo-fallback"><span>{(t(lawyer.name, locale) ?? '?').charAt(0)}</span></div>}
+            <span class="ld__photo-corner" aria-hidden="true"></span>
+          </div>
+
+          {/* 右:高密度信息 */}
+          <div class="ld__info">
+            <div class="eyebrow eyebrow-rule eyebrow-rule--seal">{t(lawyer.office, locale)} · {t(lawyer.level, locale)}</div>
+
+            <h1 class="ld__name">
+              {t(lawyer.name, locale)}
+              {locale === 'en' && lawyer.name.zh && <span class="ld__name-zh">{lawyer.name.zh}</span>}
+            </h1>
+
+            <p class="ld__bio">{t(lawyer.bio, locale)}</p>
+
+            {/* 联系方式块 */}
+            <div class="ld__contact">
+              {lawyer.phone && (
+                <a href={`tel:${lawyer.phone.replace(/\s/g, '')}`} class="ld__contact-row">
+                  <span class="ld__contact-key">{t({ zh: '电话', en: 'Phone' }, locale)}</span>
+                  <span class="ld__contact-val">{lawyer.phone}</span>
+                </a>
+              )}
+              {lawyer.email && (
+                <a href={`mailto:${lawyer.email}`} class="ld__contact-row">
+                  <span class="ld__contact-key">{t({ zh: '邮箱', en: 'Email' }, locale)}</span>
+                  <span class="ld__contact-val">{lawyer.email}</span>
+                </a>
+              )}
+              <div class="ld__contact-row">
+                <span class="ld__contact-key">{t({ zh: '执业地点', en: 'Office' }, locale)}</span>
+                <span class="ld__contact-val">{t(lawyer.office, locale)}</span>
+              </div>
+              <div class="ld__contact-row">
+                <span class="ld__contact-key">{t({ zh: '执业语言', en: 'Languages' }, locale)}</span>
+                <span class="ld__contact-val">{(lawyer.languages ?? []).join(' · ')}</span>
+              </div>
+              <div class="ld__contact-row">
+                <span class="ld__contact-key">{t({ zh: '入所年限', en: 'Years at Firm' }, locale)}</span>
+                <span class="ld__contact-val">{yearsAtFirm}+ {t({ zh: '年', en: 'yrs' }, locale)}</span>
+              </div>
+            </div>
+
+            {/* 顶部 mini 标签(教育 / 业务领域) */}
+            {lawyer.education && ta(lawyer.education, locale).length > 0 && (
+              <div class="ld__edu">
+                {ta(lawyer.education, locale).map(e => <span class="ld__chip">{e}</span>)}
+              </div>
+            )}
+
+            {/* 主 CTA */}
+            <div class="ld__cta">
+              <a href={`${prefix}/contact?for=${lawyer.slug}`} class="ld__btn ld__btn--primary">
+                {t({ zh: '委托咨询', en: 'Engage ' }, locale)}{t(lawyer.name, locale)} →
+              </a>
+              <a href={`mailto:${lawyer.email ?? 'lnlawfirm@163.com'}`} class="ld__btn ld__btn--ghost">
+                {t({ zh: '直接邮件', en: 'Email Directly' }, locale)}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ========== 详细简介(bioLong) ========== */}
+    {lawyer.bioLong && t(lawyer.bioLong, locale) && (
+      <section class="ld__section">
+        <div class="container">
+          <div class="ld__prose">
+            <div class="eyebrow eyebrow-rule">{t({ zh: '律师简介', en: 'Biography' }, locale)}</div>
+            <div class="prose" set:html={t(lawyer.bioLong, locale) ?? ''}></div>
+          </div>
+        </div>
+      </section>
+    )}
+
+    {/* ========== 3 列平行区:业务 / 擅长 / 代表案例 ========== */}
+    <section class="ld__section ld__section--3col">
+      <div class="container">
+        <div class="ld__cols">
+          {/* 列 1:业务领域 */}
+          <div class="ld__col">
+            <div class="eyebrow eyebrow-rule">{t({ zh: '业务领域', en: 'Practice Areas' }, locale)}</div>
+            <ul class="ld__list">
+              {ta(lawyer.practiceAreas, locale).map(area => (
+                <li><span class="ld__bullet">→</span><span>{area}</span></li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 列 2:擅长案件 */}
+          {lawyer.expertise && ta(lawyer.expertise, locale).length > 0 && (
+            <div class="ld__col">
+              <div class="eyebrow eyebrow-rule">{t({ zh: '擅长案件', en: 'Specialties' }, locale)}</div>
+              <ul class="ld__list">
+                {ta(lawyer.expertise, locale).map(e => (
+                  <li><span class="ld__bullet">→</span><span>{e}</span></li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* 列 3:代表案例 */}
+          <div class="ld__col">
+            <div class="eyebrow eyebrow-rule eyebrow-rule--seal">{t({ zh: '代表性业绩', en: 'Selected Works' }, locale)}</div>
+            {relatedCases.length > 0 ? (
+              <ul class="ld__works">
+                {relatedCases.map(c => (
+                  <li>
+                    <a href={`${prefix}/cases/${c.slug}`} class="ld__work">
+                      <span class="ld__work-type">{t(c.type, locale)}</span>
+                      <span class="ld__work-title">{t(c.title, locale)}</span>
+                      <span class="ld__work-arrow">→</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="ld__muted">{t({ zh: '代表业绩按所内规则不公开披露,欢迎垂询详情。', en: 'Selected works are not publicly disclosed per firm policy. Please inquire for details.' }, locale)}</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ========== CTA Banner:找这位律师 ========== */}
+    <section class="ld__ctabanner">
+      <div class="container">
+        <div class="ld__ctabanner-inner">
+          <div>
+            <div class="eyebrow eyebrow-rule eyebrow-rule--ink">{t({ zh: '联系 · Engage', en: 'Contact' }, locale)}</div>
+            <h2 class="ld__ctabanner-title">
+              {t({ zh: '找 ', en: 'Engage ' }, locale)}<em>{t(lawyer.name, locale)}</em>{t({ zh: ' 处理您的委托。', en: ' for your matter.' }, locale)}
+            </h2>
+            <p class="ld__ctabanner-lede">
+              {t({ zh: '提交委托需求后,本所将在 24 小时内回复。', en: 'Submit your engagement request and we will respond within 24 hours.' }, locale)}
+            </p>
+          </div>
+          <div class="ld__ctabanner-actions">
+            <a href={`${prefix}/contact?for=${lawyer.slug}`} class="ld__btn ld__btn--primary ld__btn--lg">
+              {t({ zh: '发起委托', en: 'Engage Us' }, locale)} →
+            </a>
+            <a href={`tel:020-81836088`} class="ld__btn ld__btn--ghost ld__btn--lg">020-81836088</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ========== 同所律师(同一 office) ========== */}
+    {allRelatedLawyers.length > 0 && (
+      <section class="ld__section">
+        <div class="container">
+          <div class="ld__related-head">
+            <div class="eyebrow eyebrow-rule">{t({ zh: '同所律师 · ' + lawyer.office.zh, en: 'Counsel · ' + lawyer.office.en }, locale)}</div>
+            <a href={`${prefix}/team`} class="ld__seeall">{t({ zh: '查看全部 →', en: 'See All →' }, locale)}</a>
+          </div>
+          <ul class="ld__related-grid">
+            {allRelatedLawyers.map(l => (
+              <li>
+                <a href={`${prefix}/team/${l.slug}`} class="ld__related">
+                  <div class="ld__related-photo">
+                    {l.avatar
+                      ? <img src={l.avatar} alt={t(l.name, locale) ?? ''} loading="lazy" />
+                      : <span>{(t(l.name, locale) ?? '?').charAt(0)}</span>}
+                  </div>
+                  <div class="ld__related-name">{t(l.name, locale)}</div>
+                  <div class="ld__related-level">{t(l.level, locale)}</div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  .lawyer-detail { padding-bottom: 0; }
+
+  /* === HERO === */
+  .ld__hero { padding: 120px var(--pad-x) 80px; background: var(--bg); }
+  .ld__back { color: var(--ink-soft); font-size: 13px; letter-spacing: 0.06em; display: inline-block; margin-bottom: 40px; transition: color 0.2s; }
+  .ld__back:hover { color: var(--ink); }
+  .ld__hero-grid { display: grid; grid-template-columns: 5fr 6fr; gap: clamp(40px, 5vw, 80px); align-items: stretch; }
+  @media (max-width: 900px) { .ld__hero-grid { grid-template-columns: 1fr; } }
+
+  /* 大头像 */
+  .ld__photo { position: relative; aspect-ratio: 3 / 4; background: var(--bg-2); overflow: hidden; }
+  .ld__photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; filter: grayscale(0%); transition: transform 1s cubic-bezier(.2,.7,.2,1), filter 0.5s; }
+  .ld__photo:hover img { transform: scale(1.03); }
+  .ld__photo-fallback { width: 100%; height: 100%; display: grid; place-items: center; background: var(--bg-2); }
+  .ld__photo-fallback span { font-family: var(--serif-zh); font-weight: 200; font-size: 200px; color: var(--ink-soft); }
+  .ld__photo-corner { position: absolute; right: 0; bottom: 0; width: 48px; height: 48px; pointer-events: none; }
+  .ld__photo-corner::before { content: ""; position: absolute; right: 20px; bottom: 20px; width: 16px; height: 1px; background: var(--bg); opacity: 0.7; }
+  .ld__photo-corner::after  { content: ""; position: absolute; right: 20px; bottom: 20px; width: 1px; height: 16px; background: var(--bg); opacity: 0.7; }
+  .ld__photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.45) 100%); pointer-events: none; }
+
+  /* 右侧信息 */
+  .ld__info { display: flex; flex-direction: column; gap: 20px; padding: 8px 0 0; }
+  .ld__name { font-family: var(--serif-zh); font-weight: 300; font-size: clamp(48px, 6.5vw, 96px); line-height: 1.05; letter-spacing: 0.01em; margin: 0; color: var(--ink); display: flex; flex-direction: column; gap: 4px; }
+  .ld__name-zh { font-family: var(--serif-zh); font-weight: 200; font-size: 22px; color: var(--ink-soft); letter-spacing: 0.08em; }
+  :global(html[lang="en"]) .ld__name-zh { display: inline-block; margin-top: 4px; }
+  .ld__bio { font-size: 18px; line-height: 1.7; color: var(--ink); margin: 0; max-width: 60ch; font-family: var(--serif-zh); }
+  :global(html[lang="en"]) .ld__bio { font-family: var(--serif-en); font-size: 16px; }
+
+  /* 联系块(高密度) */
+  .ld__contact { display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--rule-soft); margin-top: 8px; }
+  .ld__contact-row { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--rule-soft); font-size: 14px; text-decoration: none; color: inherit; align-items: baseline; }
+  .ld__contact-key { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 500; }
+  .ld__contact-val { color: var(--ink); font-family: var(--serif-en); }
+  a.ld__contact-row:hover .ld__contact-val { color: var(--seal); }
+  :global(html[lang="zh-CN"]) .ld__contact-val { font-family: var(--serif-en); }
+
+  /* 教育 chip */
+  .ld__edu { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .ld__chip { display: inline-block; padding: 5px 10px; border: 1px solid var(--rule); font-size: 12px; color: var(--ink); background: var(--bg); font-family: var(--serif-zh); }
+  :global(html[lang="en"]) .ld__chip { font-family: var(--serif-en); }
+
+  /* CTA */
+  .ld__cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+  .ld__btn { display: inline-flex; align-items: center; padding: 14px 22px; font-size: 13px; letter-spacing: 0.08em; text-decoration: none; transition: all 0.25s; cursor: pointer; border: 1px solid var(--ink); font-family: var(--serif-zh); }
+  :global(html[lang="en"]) .ld__btn { font-family: var(--serif-en); }
+  .ld__btn--primary { background: var(--ink); color: var(--bg); }
+  .ld__btn--primary:hover { background: var(--seal); border-color: var(--seal); }
+  .ld__btn--ghost { background: transparent; color: var(--ink); }
+  .ld__btn--ghost:hover { background: var(--ink); color: var(--bg); }
+  .ld__btn--lg { padding: 18px 32px; font-size: 14px; }
+
+  /* === 段落 === */
+  .ld__section { padding: 80px var(--pad-x); border-top: 1px solid var(--rule); }
+  .ld__prose { max-width: 800px; }
+  .ld__prose .prose { font-size: 17px; line-height: 1.85; color: var(--ink); margin-top: 24px; font-family: var(--serif-zh); }
+  :global(html[lang="en"]) .ld__prose .prose { font-family: var(--serif-en); }
+  :global(.ld__prose .prose p) { margin: 0 0 1.2em; }
+
+  /* === 3 列平行区 === */
+  .ld__section--3col { background: var(--bg-soft); }
+  .ld__cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(32px, 4vw, 64px); }
+  @media (max-width: 900px) { .ld__cols { grid-template-columns: 1fr; gap: 48px; } }
+  .ld__col { display: flex; flex-direction: column; gap: 16px; }
+  .ld__list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+  .ld__list li { display: flex; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--rule-soft); font-size: 15px; color: var(--ink); font-family: var(--serif-zh); }
+  :global(html[lang="en"]) .ld__list li { font-family: var(--serif-en); }
+  .ld__bullet { color: var(--seal); font-size: 14px; }
+
+  .ld__works { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+  .ld__work { display: flex; flex-direction: column; gap: 6px; padding: 16px 0; border-bottom: 1px solid var(--rule-soft); text-decoration: none; color: inherit; transition: padding 0.25s; }
+  .ld__work:hover { padding-left: 8px; }
+  .ld__work-type { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--seal); font-weight: 500; }
+  .ld__work-title { font-family: var(--serif-zh); font-size: 15px; line-height: 1.5; color: var(--ink); }
+  :global(html[lang="en"]) .ld__work-title { font-family: var(--serif-en); }
+  .ld__work-arrow { color: var(--ink-soft); font-size: 14px; margin-top: 2px; }
+  .ld__muted { font-size: 14px; color: var(--ink-soft); line-height: 1.7; }
+
+  /* === CTA Banner === */
+  .ld__ctabanner { background: var(--ink); color: var(--bg); padding: 100px var(--pad-x); }
+  .ld__ctabanner-inner { display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: end; }
+  @media (max-width: 900px) { .ld__ctabanner-inner { grid-template-columns: 1fr; gap: 32px; } }
+  .ld__ctabanner .eyebrow { color: var(--bg-soft); border-color: var(--bg-soft); }
+  .ld__ctabanner-title { font-family: var(--serif-zh); font-weight: 300; font-size: clamp(32px, 4vw, 56px); line-height: 1.2; margin: 20px 0 0; color: var(--bg); max-width: 16ch; }
+  :global(html[lang="en"]) .ld__ctabanner-title { font-family: var(--serif-en); font-size: clamp(28px, 3.5vw, 48px); }
+  .ld__ctabanner-title em { font-style: normal; color: var(--seal); }
+  .ld__ctabanner-lede { font-size: 15px; color: rgba(245, 240, 230, 0.6); margin: 16px 0 0; max-width: 50ch; }
+  .ld__ctabanner-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .ld__ctabanner .ld__btn--primary { background: var(--bg); color: var(--ink); border-color: var(--bg); }
+  .ld__ctabanner .ld__btn--primary:hover { background: var(--seal); color: var(--bg); border-color: var(--seal); }
+  .ld__ctabanner .ld__btn--ghost { background: transparent; color: var(--bg); border-color: var(--bg-soft); }
+  .ld__ctabanner .ld__btn--ghost:hover { background: var(--bg); color: var(--ink); }
+
+  /* === 同所律师 === */
+  .ld__related-head { display: flex; justify-content: space-between; align-items: end; margin-bottom: 32px; }
+  .ld__seeall { font-size: 13px; color: var(--ink-soft); }
+  .ld__seeall:hover { color: var(--ink); }
+  .ld__related-grid { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  @media (max-width: 900px) { .ld__related-grid { grid-template-columns: repeat(2, 1fr); } }
+  .ld__related { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit; }
+  .ld__related-photo { aspect-ratio: 3 / 4; background: var(--bg-2); overflow: hidden; }
+  .ld__related-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: transform 0.6s, filter 0.4s; filter: grayscale(8%); }
+  .ld__related:hover .ld__related-photo img { transform: scale(1.05); filter: grayscale(0%); }
+  .ld__related-photo span { display: grid; place-items: center; width: 100%; height: 100%; font-family: var(--serif-zh); font-size: 64px; color: var(--ink-soft); }
+  .ld__related-name { font-family: var(--serif-zh); font-size: 18px; font-weight: 500; }
+  :global(html[lang="en"]) .ld__related-name { font-family: var(--serif-en); }
+  .ld__related-level { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--seal); }
+</style>

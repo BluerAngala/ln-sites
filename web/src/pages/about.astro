@@ -1,0 +1,69 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import PageHero from '~/components/PageHero.astro';
+import { getSiteConfig, getOffices } from '~/lib/content';
+import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
+const config = await getSiteConfig();
+const offices = await getOffices();
+---
+
+<BaseLayout title={t({ zh: '关于岭南', en: 'About' }, locale)}>
+  <PageHero
+    eyebrow={t({ zh: 'About · 所况', en: 'About · The Firm' }, locale)}
+    title={t({ zh: '四十载岭南，<br/>一所而百年心。', en: 'Forty Years of Lingnan.<br/>A Century of Vision.' }, locale)}
+    lede={t({ zh: '立足粤港澳大湾区，深耕商法四十年。', en: 'Rooted in the Greater Bay Area. Dedicated to commercial law for four decades.' }, locale)}
+  />
+
+  <section class="section">
+    <div class="container">
+      <div class="prose" set:html={t(config.aboutBody, locale) ?? ''}></div>
+    </div>
+  </section>
+
+  <div class="divider" aria-hidden="true">✦ {t({ zh: '所训 · 所风', en: 'Motto · Spirit' }, locale)} ✦</div>
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="grid grid--2" style="gap: clamp(40px, 6vw, 100px);">
+        <div>
+          <span class="eyebrow eyebrow-rule eyebrow-rule--seal">{t({ zh: '所训', en: 'Motto' }, locale)}</span>
+          <blockquote class="quote-block" style="padding: 32px 0 0; text-align: left;">
+            <p class="quote-block__text" style="margin: 0;">{t(config.tagline, locale)}</p>
+            <footer class="quote-block__attr">— {t(config.taglineAttr, locale)}</footer>
+          </blockquote>
+        </div>
+        <div>
+          <span class="eyebrow eyebrow-rule">{t({ zh: '所风', en: 'Spirit' }, locale)}</span>
+          <blockquote class="quote-block" style="padding: 32px 0 0; text-align: left;">
+            <p class="quote-block__text" style="margin: 0;">{t(config.tagline2, locale)}</p>
+            <footer class="quote-block__attr">— {t(config.tagline2Attr, locale)}</footer>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" aria-hidden="true">✦ {t({ zh: '办公室', en: 'Offices' }, locale)} ✦</div>
+
+  <section class="section--tight">
+    <div class="container">
+      <div class="grid grid--3">
+        {offices.map(o => (
+          <article class="office-card card">
+            {o.isHeadquarters && <span class="tag tag--seal" style="margin-bottom: 8px;">{t({ zh: '总所', en: 'HQ' }, locale)}</span>}
+            <h3 class="card__title" style="margin-bottom: 4px;">{t(o.city, locale)}</h3>
+            <div class="card__eyebrow" style="margin-bottom: 16px;">{o.city.en ?? o.city.zh}</div>
+            <p class="card__excerpt">{t(o.address, locale)}</p>
+            <div style="font-size: 14px; color: var(--ink-soft); margin-top: 8px;">
+              <div>📞 <a href={`tel:${o.phone.replace(/\s/g, '')}`}>{o.phone}</a></div>
+              {o.email && <div>✉️ <a href={`mailto:${o.email}`}>{o.email}</a></div>}
+            </div>
+            {o.description && <p class="card__excerpt" style="margin-top: 12px; font-size: 13px;">{t(o.description, locale)}</p>}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,49 @@
+---
+import { getSiteConfig } from '~/lib/content';
+import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
+const config = await getSiteConfig();
+---
+
+<section class="stats">
+  <div class="stats__inner">
+    {config.stats.map(s => (
+      <div class="stat">
+        <div class="stat__num">
+          <span class="stat__counter" data-to={t(s.num, locale)}>{t(s.num, locale)}</span>
+          {t(s.suffix, locale) && <em>{t(s.suffix, locale)}</em>}
+        </div>
+        <div class="stat__label" set:html={(t(s.label, locale) ?? '').replace(/\n/g, '<br/>')}></div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReduced) {
+    const counters = document.querySelectorAll<HTMLElement>('.stat__counter');
+    const animate = (el: HTMLElement) => {
+      const to = parseInt(el.dataset.to || '0', 10);
+      if (!to) return;
+      el.textContent = '0';
+      const duration = 1400;
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(to * eased).toString();
+        if (t < 1) requestAnimationFrame(step);
+        else el.textContent = to.toString();
+      };
+      requestAnimationFrame(step);
+    };
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) { animate(e.target as HTMLElement); io.unobserve(e.target); }
+      }
+    }, { threshold: 0.3 });
+    counters.forEach(c => io.observe(c));
+  }
+</script>
