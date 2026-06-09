@@ -114,7 +114,7 @@ const canonical = new URL(
           <script is:inline define:vars={{ botId: cozeBotId, token: cozeToken }}>
             window.__cozeBotId = botId; window.__cozeToken = token;
           </script>
-          <script src="/scripts/coze-init.js" />
+          <script is:inline src="/scripts/coze-init.js" />
         </>
       )
     }
