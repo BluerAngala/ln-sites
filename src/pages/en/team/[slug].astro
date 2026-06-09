@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import { getLawyers, getLawyerBySlug, getCases } from '~/lib/content';
-import { t, ta, type Locale } from '~/i18n';
+import { t, ta, ut, type Locale } from '~/i18n';
 
 const locale: Locale = 'en';
 
@@ -30,7 +30,7 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
     {/* ========== HERO:左大头像 + 右侧高密度信息 ========== */}
     <section class="ld__hero">
       <div class="container">
-        <a href="/en/team" class="ld__back">← Back to Counsel</a>
+        <a href="/en/team" class="ld__back">← {ut('team.back', locale)}</a>
         <div class="ld__hero-grid">
           <div class="ld__photo">
             {
@@ -61,7 +61,7 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
               {
                 lawyer.phone && (
                   <a href={`tel:${lawyer.phone.replace(/\s/g, '')}`} class="ld__contact-row">
-                    <span class="ld__contact-key">Phone</span>
+                    <span class="ld__contact-key">{t({ zh: '电话', en: 'Phone' }, locale)}</span>
                     <span class="ld__contact-val">{lawyer.phone}</span>
                   </a>
                 )
@@ -69,22 +69,27 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
               {
                 lawyer.email && (
                   <a href={`mailto:${lawyer.email}`} class="ld__contact-row">
-                    <span class="ld__contact-key">Email</span>
+                    <span class="ld__contact-key">{t({ zh: '邮箱', en: 'Email' }, locale)}</span>
                     <span class="ld__contact-val">{lawyer.email}</span>
                   </a>
                 )
               }
               <div class="ld__contact-row">
-                <span class="ld__contact-key">Office</span>
+                <span class="ld__contact-key">{t({ zh: '执业地点', en: 'Office' }, locale)}</span>
                 <span class="ld__contact-val">{t(lawyer.office, locale)}</span>
               </div>
               <div class="ld__contact-row">
-                <span class="ld__contact-key">Languages</span>
+                <span class="ld__contact-key">{t({ zh: '执业语言', en: 'Languages' }, locale)}</span
+                >
                 <span class="ld__contact-val">{(lawyer.languages ?? []).join(' · ')}</span>
               </div>
               <div class="ld__contact-row">
-                <span class="ld__contact-key">Years at Firm</span>
-                <span class="ld__contact-val">{yearsAtFirm}+ yrs</span>
+                <span class="ld__contact-key"
+                  >{t({ zh: '入所年限', en: 'Years at Firm' }, locale)}</span
+                >
+                <span class="ld__contact-val"
+                  >{yearsAtFirm}+ {t({ zh: '年', en: 'yrs' }, locale)}</span
+                >
               </div>
             </div>
 
@@ -100,13 +105,14 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
 
             <div class="ld__cta">
               <a href={`/en/contact?for=${lawyer.slug}`} class="ld__btn ld__btn--primary">
-                Engage {t(lawyer.name, locale)} →
+                {ut('team.cta.engage', locale)}
+                {t(lawyer.name, locale)} →
               </a>
               <a
                 href={`mailto:${lawyer.email ?? 'lnlawfirm@163.com'}`}
                 class="ld__btn ld__btn--ghost"
               >
-                Email Directly
+                {t({ zh: '直接邮件', en: 'Email Directly' }, locale)}
               </a>
             </div>
           </div>
@@ -119,7 +125,9 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
         <section class="ld__section">
           <div class="container">
             <div class="ld__prose">
-              <div class="eyebrow eyebrow-rule">Biography</div>
+              <div class="eyebrow eyebrow-rule">
+                {t({ zh: '律师简介', en: 'Biography' }, locale)}
+              </div>
               <div class="prose" set:html={t(lawyer.bioLong, locale) ?? ''} />
             </div>
           </div>
@@ -131,7 +139,7 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
       <div class="container">
         <div class="ld__cols">
           <div class="ld__col">
-            <div class="eyebrow eyebrow-rule">Practice Areas</div>
+            <div class="eyebrow eyebrow-rule">{ut('team.section.practice', locale)}</div>
             <ul class="ld__list">
               {
                 ta(lawyer.practiceAreas, locale).map((area) => (
@@ -149,7 +157,7 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
           {
             lawyer.expertise && ta(lawyer.expertise, locale).length > 0 && (
               <div class="ld__col">
-                <div class="eyebrow eyebrow-rule">Specialties</div>
+                <div class="eyebrow eyebrow-rule">{ut('team.section.specialties', locale)}</div>
                 <ul class="ld__list">
                   {ta(lawyer.expertise, locale).map((e) => (
                     <li>
@@ -163,7 +171,9 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
           }
 
           <div class="ld__col">
-            <div class="eyebrow eyebrow-rule eyebrow-rule--seal">Selected Works</div>
+            <div class="eyebrow eyebrow-rule eyebrow-rule--seal">
+              {ut('team.section.works', locale)}
+            </div>
             {
               relatedCases.length > 0 ? (
                 <ul class="ld__works">
@@ -193,17 +203,21 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
       <div class="container">
         <div class="ld__ctabanner-inner">
           <div>
-            <div class="eyebrow eyebrow-rule eyebrow-rule--ink">Contact</div>
+            <div class="eyebrow eyebrow-rule eyebrow-rule--ink">
+              {ut('team.eyebrow.contact', locale)}
+            </div>
             <h2 class="ld__ctabanner-title">
-              Engage <em>{t(lawyer.name, locale)}</em> for your matter.
+              {ut('team.cta.findPrefix', locale)}<em>{t(lawyer.name, locale)}</em>{
+                ut('team.cta.findSuffix', locale)
+              }
             </h2>
             <p class="ld__ctabanner-lede">
-              Submit your engagement request and we will respond within 24 hours.
+              {ut('team.cta.lede', locale)}
             </p>
           </div>
           <div class="ld__ctabanner-actions">
             <a href={`/en/contact?for=${lawyer.slug}`} class="ld__btn ld__btn--primary ld__btn--lg">
-              Engage Us →
+              {ut('team.cta.engageUs', locale)} →
             </a>
             <a href={`tel:020-81836088`} class="ld__btn ld__btn--ghost ld__btn--lg">020-81836088</a>
           </div>
@@ -218,7 +232,7 @@ const yearsAtFirm = 10 + (lawyer.order ?? 0);
             <div class="ld__related-head">
               <div class="eyebrow eyebrow-rule">Counsel · {t(lawyer.office, locale)}</div>
               <a href="/en/team" class="ld__seeall">
-                See All →
+                {t({ zh: '查看全部 →', en: 'See All →' }, locale)}
               </a>
             </div>
             <ul class="ld__related-grid">

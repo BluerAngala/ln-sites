@@ -50,22 +50,62 @@ export const ui = {
   'team.partners': { zh: '合伙人 · Partners', en: 'Partners' },
   'team.counsels': { zh: '资深律师 · Senior Counsels', en: 'Senior Counsels' },
   'team.back': { zh: '返回律师列表', en: 'Back to Counsel' },
+  'team.eyebrow.contact': { zh: '联系 · Engage', en: 'Contact' },
+  'team.section.practice': { zh: '业务领域', en: 'Practice Areas' },
+  'team.section.specialties': { zh: '擅长案件', en: 'Specialties' },
+  'team.section.works': { zh: '代表性业绩', en: 'Selected Works' },
+  'team.cta.engage': { zh: '委托咨询', en: 'Engage' },
+  'team.cta.engageUs': { zh: '发起委托', en: 'Engage Us' },
+  'team.cta.findPrefix': { zh: '找 ', en: 'Engage ' },
+  'team.cta.findSuffix': { zh: ' 处理您的委托。', en: ' for your matter.' },
+  'team.cta.lede': {
+    zh: '提交委托需求后,本所将在 24 小时内回复。',
+    en: 'Submit your engagement request and we will respond within 24 hours.',
+  },
 
   'cases.back': { zh: '返回案例列表', en: 'Back to Works' },
   'cases.consult': { zh: '就此咨询', en: 'Inquire' },
   'cases.leadLawyer': { zh: '主理律师', en: 'Lead Counsel' },
   'cases.assocLawyers': { zh: '协办律师', en: 'Co-Counsel' },
+  'cases.highlights': { zh: '亮点', en: 'Highlights' },
+  'cases.cta.inquire': { zh: '就此咨询 · Inquire', en: 'Inquire' },
 
   'news.back': { zh: '返回资讯列表', en: 'Back to News' },
+  'news.byAuthor': { zh: '由 {author} 发布', en: 'By {author}' },
+
+  'rss.title': {
+    zh: '岭南律师事务所 · 新闻动态',
+    en: 'Lingnan Law Firm · News',
+  },
+  'rss.description': {
+    zh: '广东岭南律师事务所所内动态、行业观察、媒体报道',
+    en: 'Firm news, industry insight, and media coverage from Lingnan.',
+  },
+  'rss.lang': { zh: 'zh-cn', en: 'en-us' },
 
   'contact.submit': { zh: '提交委托', en: 'Submit' },
   'contact.required': { zh: '必填', en: 'Required' },
 } satisfies Record<string, Str>;
 
-/** 查 UI 字典 */
-export function ut(key: keyof typeof ui, locale: Locale): string {
+/**
+ * 查 UI 字典 + 占位符替换
+ *   ut('news.byAuthor', locale, { author: '张三' })
+ *     → zh: '由 张三 发布'
+ *     → en: 'By 张三'
+ */
+export function ut(
+  key: keyof typeof ui,
+  locale: Locale,
+  vars?: Record<string, string | number>,
+): string {
   const entry = ui[key];
-  return entry[locale] ?? entry.zh;
+  let s = entry[locale] ?? entry.zh;
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      s = s.replaceAll(`{${k}}`, String(v));
+    }
+  }
+  return s;
 }
 
 /* ============================================================

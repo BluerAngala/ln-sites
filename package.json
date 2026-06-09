@@ -7,9 +7,10 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "npm run check:i18n && astro build",
     "preview": "astro preview",
     "lint": "astro check",
+    "check:i18n": "python3 scripts/check-i18n.py",
     "format": "prettier --write \"**/*.{astro,ts,tsx,js,mjs,cjs,json,md,css}\" --ignore-path .prettierignore",
     "format:check": "prettier --check \"**/*.{astro,ts,tsx,js,mjs,cjs,json,md,css}\" --ignore-path .prettierignore",
     "prepare": "husky",

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import { getNews, getNewsBySlug } from '~/lib/content';
-import { t, type Locale } from '~/i18n';
+import { t, ut, type Locale } from '~/i18n';
 
 const locale: Locale = 'en';
 
@@ -18,7 +18,7 @@ if (!n) return Astro.redirect('/en/news/');
 <BaseLayout title={t(n.title, locale) ?? ''} description={t(n.summary, locale)}>
   <article class="news-detail">
     <div class="container">
-      <a href="/en/news/" class="back-link">← Back to News</a>
+      <a href="/en/news/" class="back-link">← {ut('news.back', locale)}</a>
 
       <header
         style="margin-top: 32px; text-align: center; max-width: 760px; margin-left: auto; margin-right: auto;"
@@ -40,7 +40,7 @@ if (!n) return Astro.redirect('/en/news/');
         {
           n.author && (
             <div class="muted" style="margin-top: 16px; font-size: 13px;">
-              By {n.author}
+              {ut('news.byAuthor', locale, { author: n.author })}
             </div>
           )
         }
@@ -67,7 +67,7 @@ if (!n) return Astro.redirect('/en/news/');
       <div
         style="text-align: center; margin-top: 80px; padding-top: 60px; border-top: 1px solid var(--rule-soft);"
       >
-        <a href="/en/news/" class="btn btn--ghost">Back to News →</a>
+        <a href="/en/news/" class="btn btn--ghost">{ut('news.back', locale)} →</a>
       </div>
     </div>
   </article>

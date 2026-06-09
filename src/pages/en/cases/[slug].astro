@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import { getCases, getCaseBySlug, getLawyers } from '~/lib/content';
-import { t, ta, type Locale } from '~/i18n';
+import { t, ta, ut, type Locale } from '~/i18n';
 
 const locale: Locale = 'en';
 
@@ -25,7 +25,7 @@ const otherLawyers = (c.lawyerIds ?? [])
 <BaseLayout title={t(c.title, locale) ?? ''} description={t(c.summary, locale)}>
   <article class="case-detail">
     <div class="container">
-      <a href="/en/cases/" class="back-link">← Back to Works</a>
+      <a href="/en/cases/" class="back-link">← {ut('cases.back', locale)}</a>
 
       <header style="margin-top: 32px; border-bottom: 1px solid var(--rule); padding-bottom: 40px;">
         <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
@@ -50,7 +50,9 @@ const otherLawyers = (c.lawyerIds ?? [])
           {
             c.highlights && ta(c.highlights, locale).length > 0 && (
               <div class="case-highlights">
-                <span class="eyebrow eyebrow-rule eyebrow-rule--seal">Highlights</span>
+                <span class="eyebrow eyebrow-rule eyebrow-rule--seal">
+                  {ut('cases.highlights', locale)}
+                </span>
                 <ul style="margin-top: 16px; list-style: none; padding: 0;">
                   {ta(c.highlights, locale).map((h) => (
                     <li class="case-highlight">{h}</li>
@@ -61,7 +63,7 @@ const otherLawyers = (c.lawyerIds ?? [])
           }
 
           <div style="margin-top: 40px;">
-            <span class="eyebrow eyebrow-rule">Lead Counsel</span>
+            <span class="eyebrow eyebrow-rule">{ut('cases.leadLawyer', locale)}</span>
             {
               leadLawyer && (
                 <a href={`/en/team/${leadLawyer.slug}/`} class="case-lawyer-link">
@@ -76,7 +78,7 @@ const otherLawyers = (c.lawyerIds ?? [])
           {
             otherLawyers.length > 0 && (
               <div style="margin-top: 32px;">
-                <span class="eyebrow eyebrow-rule">Co-Counsel</span>
+                <span class="eyebrow eyebrow-rule">{ut('cases.assocLawyers', locale)}</span>
                 <ul style="margin-top: 16px;">
                   {otherLawyers.map((l) => (
                     <li style="padding: 8px 0; border-bottom: 1px solid var(--rule-soft);">
@@ -98,7 +100,9 @@ const otherLawyers = (c.lawyerIds ?? [])
           }
 
           <div style="margin-top: 40px;">
-            <a href="/en/contact/" class="btn btn--solid btn--full">Inquire →</a>
+            <a href="/en/contact/" class="btn btn--solid btn--full"
+              >{ut('cases.consult', locale)} →</a
+            >
           </div>
         </aside>
       </div>
