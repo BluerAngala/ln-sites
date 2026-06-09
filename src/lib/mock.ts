@@ -1701,6 +1701,7 @@ const social: SocialItem[] = [
       zh: '张智敏、叶龙生律师分别荣获「顾问之星」「调解之星」称号。',
       en: 'ZHANG Zhimin and YE Longsheng received "Advisor Star" and "Mediation Star" awards, respectively.',
     },
+    sourceUrl: 'http://www.lnlawfirm.cn/list_122.html',
   },
   {
     id: 's-orig-02',
@@ -1715,6 +1716,7 @@ const social: SocialItem[] = [
       zh: '组织三支队伍参赛，为第十五届全运贡献法律人力量。',
       en: 'Fielded three teams for the 15th National Games support event.',
     },
+    sourceUrl: 'http://www.lnlawfirm.cn/list_122.html',
   },
   {
     id: 's-orig-03',
@@ -1729,6 +1731,7 @@ const social: SocialItem[] = [
       zh: '我所为同学们介绍律所运作、律师执业等内容。',
       en: 'Introduction to firm operations and the practice of law for high-school students.',
     },
+    sourceUrl: 'http://www.lnlawfirm.cn/list_122.html',
   },
   {
     id: 's-orig-04',
@@ -1743,6 +1746,7 @@ const social: SocialItem[] = [
       zh: '卓冬青律师受邀主讲未成年人权益保护专题。',
       en: "Attorney ZHUO Dongqing lectured on minors' rights protection.",
     },
+    sourceUrl: 'http://www.lnlawfirm.cn/list_122.html',
   },
   {
     id: 's-orig-05',
@@ -1757,6 +1761,7 @@ const social: SocialItem[] = [
       zh: '我所龙舟队受邀参赛并卫冕冠军。',
       en: "Our firm's dragon boat team was invited and successfully defended the championship.",
     },
+    sourceUrl: 'http://www.lnlawfirm.cn/list_122.html',
   },
   {
     id: 's-orig-06',
@@ -1768,6 +1773,7 @@ const social: SocialItem[] = [
       zh: '我所律师赴从化开展慰问活动。',
       en: 'Our attorneys conducted an outreach activity in Conghua.',
     },
+    sourceUrl: 'http://www.lnlawfirm.cn/list_122_636.html',
   },
 ];
 

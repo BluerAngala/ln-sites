@@ -143,6 +143,8 @@ export interface SocialItem extends BaseContent {
   category: I18n<string>;
   description: I18n<string>;
   content?: I18n<string>;
+  /** 外部原文链接（原站文章页），存在时卡片整张可点击跳转 */
+  sourceUrl?: string;
 }
 
 /* ---------- Site Config ---------- */

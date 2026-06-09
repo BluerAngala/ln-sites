@@ -217,6 +217,7 @@ function mapSocial(rec: LarkRecord): SocialItem {
     category: i18nStr(f.category, f.categoryEn),
     description: i18nStr(f.description, f.descriptionEn),
     content: i18nStr(f.content, f.contentEn),
+    sourceUrl: f.sourceUrl ? String(f.sourceUrl) : undefined,
   };
 }
 

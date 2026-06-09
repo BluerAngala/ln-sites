@@ -26,38 +26,22 @@ const items = await getSocial();
   {/* ========== 党建组织架构 ========== */}
   <section class="section--tight" id="dj-structure" style="padding-top: 0;">
     <div class="container">
-      <header class="section-header section-header--center">
-        <span class="eyebrow eyebrow-rule eyebrow-rule--seal section-header__eyebrow"
-          >{t({ zh: '组织架构', en: 'Structure' }, locale)}</span
-        >
-        <h2 class="h2 section-header__title">
-          {
-            t(
-              {
-                zh: '党建引领，凝心聚力。',
-                en: 'Party-Building Leads. Hearts Aligned.',
-              },
-              locale,
-            )
-          }
-        </h2>
-        <p class="section-header__subtitle">
-          {
-            t(
-              {
-                zh: '中共广东岭南律师事务所总支部委员会',
-                en: 'General Branch Committee of CPC Lingnan Counsel & Attorneys at Law',
-              },
-              locale,
-            )
-          }
-        </p>
-      </header>
+      <div class="org-eyebrow-wrap">
+        <span class="org-eyebrow">{t({ zh: '组织架构', en: 'Structure' }, locale)}</span>
+      </div>
 
       <div class="org-tree">
         {/* 总支委员会 — 顶层 */}
         <div class="org-node org-node--top">
-          <div class="org-node__chip">①</div>
+          <div class="org-node__mark org-node__mark--diamond" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22"
+              ><path
+                d="M12 2 L22 12 L12 22 L2 12 Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"></path></svg
+            >
+          </div>
           <div class="org-node__body">
             <h3 class="org-node__title">
               {t({ zh: '党总支委员会', en: 'General Branch Committee' }, locale)}
@@ -78,63 +62,98 @@ const items = await getSocial();
 
         {/* 三条分支 — 纪检 / 党支部 / 团支部 */}
         <div class="org-branches">
-          <div class="org-node">
-            <div class="org-node__chip">②</div>
-            <div class="org-node__body">
-              <h4 class="org-node__title">
-                {t({ zh: '纪检委员', en: 'Discipline Committee' }, locale)}
-              </h4>
-              <p class="org-node__sub">
-                {
-                  t(
-                    {
-                      zh: '负责党风党纪、廉政建设与执业监督',
-                      en: 'Party discipline, integrity, and practice oversight',
-                    },
-                    locale,
-                  )
-                }
-              </p>
+          <div class="org-branch">
+            <div class="org-node">
+              <div class="org-node__mark org-node__mark--circle" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"
+                  ><circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"></circle></svg
+                >
+              </div>
+              <div class="org-node__body">
+                <h4 class="org-node__title">
+                  {t({ zh: '纪检委员', en: 'Discipline Committee' }, locale)}
+                </h4>
+                <p class="org-node__sub">
+                  {
+                    t(
+                      {
+                        zh: '党风党纪 · 廉政建设 · 执业监督',
+                        en: 'Party discipline, integrity, and practice oversight',
+                      },
+                      locale,
+                    )
+                  }
+                </p>
+              </div>
             </div>
           </div>
 
-          <div class="org-node">
-            <div class="org-node__chip">③</div>
-            <div class="org-node__body">
-              <h4 class="org-node__title">
-                {t({ zh: '党支部', en: 'Party Branch' }, locale)}
-              </h4>
-              <p class="org-node__sub">
-                {
-                  t(
-                    {
-                      zh: '组织党员教育、管理与服务，推进党建业务融合',
-                      en: 'Education, management, and service for party members',
-                    },
-                    locale,
-                  )
-                }
-              </p>
+          <div class="org-branch">
+            <div class="org-node">
+              <div class="org-node__mark org-node__mark--square" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"
+                  ><rect
+                    x="3"
+                    y="3"
+                    width="18"
+                    height="18"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"></rect></svg
+                >
+              </div>
+              <div class="org-node__body">
+                <h4 class="org-node__title">
+                  {t({ zh: '党支部', en: 'Party Branch' }, locale)}
+                </h4>
+                <p class="org-node__sub">
+                  {
+                    t(
+                      {
+                        zh: '党员教育 · 管理服务 · 党建业务融合',
+                        en: 'Education, management, and service for party members',
+                      },
+                      locale,
+                    )
+                  }
+                </p>
+              </div>
             </div>
           </div>
 
-          <div class="org-node">
-            <div class="org-node__chip">④</div>
-            <div class="org-node__body">
-              <h4 class="org-node__title">
-                {t({ zh: '团支部', en: 'Youth League Branch' }, locale)}
-              </h4>
-              <p class="org-node__sub">
-                {
-                  t(
-                    {
-                      zh: '团结青年律师，开展岗位建功与志愿服务',
-                      en: 'Unites young attorneys for service and volunteering',
-                    },
-                    locale,
-                  )
-                }
-              </p>
+          <div class="org-branch">
+            <div class="org-node">
+              <div class="org-node__mark org-node__mark--hex" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22"
+                  ><path
+                    d="M12 2 L21 7 L21 17 L12 22 L3 17 L3 7 Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.6"></path></svg
+                >
+              </div>
+              <div class="org-node__body">
+                <h4 class="org-node__title">
+                  {t({ zh: '团支部', en: 'Youth League Branch' }, locale)}
+                </h4>
+                <p class="org-node__sub">
+                  {
+                    t(
+                      {
+                        zh: '团结青年律师 · 岗位建功 · 志愿服务',
+                        en: 'Unites young attorneys for service and volunteering',
+                      },
+                      locale,
+                    )
+                  }
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -155,29 +174,11 @@ const items = await getSocial();
   </section>
 
   {/* ========== 公益活动 ========== */}
-  <section class="section" id="public-welfare" style="background: var(--bg-2);">
+  <section class="section--tight" id="public-welfare" style="background: var(--bg-2);">
     <div class="container">
-      <header class="section-header section-header--center">
-        <span class="eyebrow eyebrow-rule eyebrow-rule--seal section-header__eyebrow"
-          >{t({ zh: '公益活动', en: 'Activities' }, locale)}</span
-        >
-        <h2 class="h2 section-header__title">
-          {
-            t(
-              {
-                zh: '所内动态 · 公益足迹',
-                en: 'Firm Activities · Public Footprints',
-              },
-              locale,
-            )
-          }
-        </h2>
-      </header>
-    </div>
-  </section>
-
-  <section class="section--tight" style="padding-top: 0;">
-    <div class="container">
+      <div class="org-eyebrow-wrap">
+        <span class="org-eyebrow">{t({ zh: '公益活动', en: 'Activities' }, locale)}</span>
+      </div>
       {
         items.length === 0 ? (
           <p class="muted" style="text-align: center; padding: 80px 0;">
@@ -185,26 +186,41 @@ const items = await getSocial();
           </p>
         ) : (
           <div class="social-grid">
-            {items.map((item) => (
-              <article class="social-item card">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                  <span class="tag tag--seal">{t(item.category, locale)}</span>
-                  <span
-                    class="muted"
-                    style="font-family: var(--serif-en); font-size: 13px; letter-spacing: 0.1em;"
-                  >
-                    {item.date}
-                  </span>
-                </div>
-                <h3 class="card__title">{t(item.title, locale)}</h3>
-                {item.location && (
-                  <div class="card__eyebrow" style="margin-bottom: 12px;">
-                    📍 {t(item.location, locale)}
+            {items.map((item) => {
+              const href = item.sourceUrl;
+              return (
+                <article class="social-item card">
+                  <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <span class="tag tag--seal">{t(item.category, locale)}</span>
+                    <span
+                      class="muted"
+                      style="font-family: var(--serif-en); font-size: 13px; letter-spacing: 0.1em;"
+                    >
+                      {item.date}
+                    </span>
                   </div>
-                )}
-                <p class="card__excerpt">{t(item.description, locale)}</p>
-              </article>
-            ))}
+                  {href ? (
+                    <a
+                      class="card__link"
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={t(item.title, locale)}
+                    >
+                      <h3 class="card__title">{t(item.title, locale)}</h3>
+                    </a>
+                  ) : (
+                    <h3 class="card__title">{t(item.title, locale)}</h3>
+                  )}
+                  {item.location && (
+                    <div class="card__eyebrow" style="margin-bottom: 12px;">
+                      📍 {t(item.location, locale)}
+                    </div>
+                  )}
+                  <p class="card__excerpt">{t(item.description, locale)}</p>
+                </article>
+              );
+            })}
           </div>
         )
       }
@@ -219,9 +235,43 @@ const items = await getSocial();
     gap: var(--gutter);
   }
 
+  .card__link {
+    color: inherit;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .card__link:hover .card__title {
+    color: var(--seal);
+  }
+
+  /* 党建 — 居中大 eyebrow */
+  .org-eyebrow-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  .org-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--serif-en);
+    font-size: clamp(16px, 2vw, 22px);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--seal);
+    font-weight: 500;
+  }
+  .org-eyebrow::before,
+  .org-eyebrow::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1.5px;
+    background: var(--seal);
+  }
+
   /* 党建组织架构 */
   .org-tree {
-    margin-top: 48px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -239,15 +289,15 @@ const items = await getSocial();
     position: relative;
   }
   .org-node--top {
-    background: var(--ink);
+    background: var(--seal);
     color: var(--bg);
-    border-color: var(--ink);
+    border-color: var(--seal);
   }
   .org-node--top .org-node__title {
     color: var(--bg);
   }
   .org-node--top .org-node__sub {
-    color: rgba(245, 240, 230, 0.7);
+    color: rgba(255, 255, 255, 0.82);
   }
   .org-node--top::after {
     content: '';
@@ -255,11 +305,11 @@ const items = await getSocial();
     left: 50%;
     bottom: -28px;
     transform: translateX(-50%);
-    width: 1px;
+    width: 1.5px;
     height: 28px;
     background: var(--rule);
   }
-  .org-node__chip {
+  .org-node__mark {
     display: grid;
     place-items: center;
     width: 48px;
@@ -268,14 +318,12 @@ const items = await getSocial();
     border-radius: 50%;
     border: 1.5px solid var(--seal);
     color: var(--seal);
-    font-family: var(--serif-en);
-    font-size: 18px;
-    font-weight: 500;
+    background: var(--bg);
   }
-  .org-node--top .org-node__chip {
-    background: var(--seal);
-    color: var(--bg);
-    border-color: var(--seal);
+  .org-node--top .org-node__mark {
+    background: var(--bg);
+    color: var(--seal);
+    border-color: var(--bg);
   }
   .org-node__body {
     flex: 1;
@@ -309,7 +357,7 @@ const items = await getSocial();
     gap: 24px;
     margin-top: 56px;
     width: 100%;
-    max-width: 960px;
+    max-width: 1040px;
     position: relative;
   }
   .org-branches::before {
@@ -318,9 +366,9 @@ const items = await getSocial();
     left: 50%;
     top: -28px;
     transform: translateX(-50%);
-    width: calc(100% - 96px);
-    max-width: 768px;
-    height: 1px;
+    width: calc(100% - 120px);
+    max-width: 820px;
+    height: 1.5px;
     background: var(--rule);
   }
   .org-branches::after {
@@ -329,35 +377,118 @@ const items = await getSocial();
     left: 50%;
     top: -28px;
     transform: translateX(-50%);
-    width: 1px;
+    width: 1.5px;
     height: 28px;
     background: var(--rule);
   }
-  .org-branches .org-node {
+  .org-branch {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .org-branch::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -28px;
+    transform: translateX(-50%);
+    width: 1.5px;
+    height: 28px;
+    background: var(--rule);
+  }
+  .org-branch .org-node {
     flex-direction: column;
     align-items: center;
     text-align: center;
     padding: 32px 24px;
     gap: 16px;
+    max-width: 100%;
   }
-  .org-branches .org-node__body {
+  .org-branch .org-node__body {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
-  .org-branches .org-node__title {
+  .org-branch .org-node__title {
     font-size: 18px;
   }
-  .org-branches .org-node__sub {
+  .org-branch .org-node__sub {
     font-size: 13px;
   }
+
+  /* 二层节点 — 党小组 / 联合支部 / 青年组织 */
+  .org-sub-branches {
+    margin-top: 24px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+  .org-sub-branches::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -24px;
+    transform: translateX(-50%);
+    width: 1.5px;
+    height: 24px;
+    background: var(--rule);
+  }
+  .org-sub-node {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background: var(--bg);
+    border: 1px solid var(--rule-soft);
+    border-left: 2px solid var(--seal);
+    width: 100%;
+    position: relative;
+  }
+  .org-sub-node::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 50%;
+    width: 28px;
+    height: 1.5px;
+    background: var(--rule);
+  }
+  .org-sub-node__no {
+    font-family: var(--serif-en);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--seal);
+    letter-spacing: 0.05em;
+  }
+  .org-sub-node__name {
+    font-family: var(--serif-zh);
+    font-size: 14px;
+    color: var(--ink);
+  }
+  :global(html[lang='en']) .org-sub-node__name {
+    font-family: var(--serif-en);
+    font-size: 13px;
+  }
+  .org-sub-branches > .org-sub-node:first-child::before {
+    top: 50%;
+  }
+  .org-sub-branches > .org-sub-node:last-child::before {
+    top: 50%;
+  }
+
   @media (max-width: 800px) {
     .org-branches {
       grid-template-columns: 1fr;
-      gap: 16px;
+      gap: 32px;
     }
     .org-branches::before,
-    .org-branches::after {
+    .org-branches::after,
+    .org-branch::before,
+    .org-sub-branches::before,
+    .org-sub-node::before {
       display: none;
     }
   }
