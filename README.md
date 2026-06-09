@@ -1,185 +1,150 @@
-# 岭南律师事务所 · 官网
+# 岭南律师事务所 · 官网（web/）
 
-> 广东岭南律师事务所（Guangdong Lingnan Law Firm）官网源码仓库。
-> 创立于 1984 年，学院派综合性大所，公司商事、争议解决、知识产权、跨境投资、刑事辩护、资本市场等业务领域。
+> 官方网站主仓库。Astro 静态站 + 飞书多维表格（Base）作为内容源。
 
-本仓库托管：
+**所在路径**：`/岭南所官网/web/`
 
-1. **`web/`** — 选定的**正式版官网方案**（Astro 5 + 飞书多维表格 CMS）
-2. **`site/`** — 设计稿 A：墨分五色 / The Counsel / Lex A（备选）
-3. **`sites/`** — 设计稿 B：学院派（带深 / 浅 / 编辑三主题切换，备选）
-4. **`docs/`** — 飞书建表操作指南
+## 技术栈
 
----
+- **Astro 5.x** — 静态站点生成器，零 JS 优先，极快首屏
+- **TypeScript** — 全量类型
+- **飞书多维表格** — 后端 CMS（可选），通过 REST API 拉取
+- **本地 mock 兜底** — 没配飞书凭证时仍可跑、CI 可稳过 build
 
-## 一、`web/` 官网主仓库
-
-技术栈：**Astro 5 静态站 + 飞书多维表格作 CMS**。
-
-- 视觉风格：复用 `site/01-lingnan-yin/` 的墨分五色 + 印章 + 大字
-- 内容管理：律师/助理在飞书多维表格里加案例、改数字，网站自动同步
-- **无需飞书凭证也能跑**（用本地 mock 兜底）
-- 部署支持：Vercel / Netlify / Cloudflare Pages / 任意静态托管
-- 完全开源（MIT 依赖）
-
-### 快速开始
+## 快速开始
 
 ```bash
-cd web
 npm install
-cp .env.example .env       # 可选：填飞书凭证
-npm run dev                # http://localhost:4321
+cp .env.example .env       # 可选：填入飞书凭证
+npm run dev                # 打开 http://localhost:4321
 ```
 
-### 接入飞书
+不需要任何凭证就能跑（用本地 mock 数据）。
 
-1. 飞书开放平台建自建应用（5 分钟）
-2. 创建一个多维表格「岭南所官网内容库」，按 [docs/FEISHU_CMS.md](docs/FEISHU_CMS.md) 建 8 张表
+## 接入飞书
+
+详细步骤见 [../docs/FEISHU_CMS.md](../docs/FEISHU_CMS.md)。
+
+简短版：
+
+1. 飞书开放平台建自建应用，拿到 App ID / Secret
+2. 创建一个多维表格「岭南所官网内容库」，按文档建 8 张表
 3. 复制 Base Token + 8 个 Table ID 到 `.env`
 4. 跑 `npm run lark:test` 验证连通
 5. 跑 `npm run build` 部署
 
-### 飞书建表操作指南
-
-→ [docs/FEISHU_CMS.md](docs/FEISHU_CMS.md)（**给运营/律师助理看的，零代码**）
-
-### 部署到 Vercel
-
-1. 仓库连到 Vercel
-2. **Root Directory** = `web`
-3. **Build Command** = `npm run build`
-4. **Output Directory** = `dist`
-5. 触发首次部署
-
-详细：[web/README.md](web/README.md)
-
----
-
-## 二、设计稿（备选方案）
-
-> 这两组设计稿是评审期产出的备选方案，**不影响** `web/` 正式版。
-> 设计稿保留在这里作为视觉风格参考 / 备选 / 复用。
-
-### `site/` 设计稿 A：墨分五色（东方雅致）
+## 目录结构
 
 ```
-site/
-├── 01-lingnan-yin/    方案 01 — 墨分五色，印信立言（已被 web/ 复用为视觉底版）
-├── 02-the-counsel/    方案 02 — The Counsel
-└── 03-lex-a/          方案 03 — Lex A
+web/
+├── astro.config.mjs
+├── package.json
+├── tsconfig.json
+├── .env.example
+├── public/                       # 静态资源
+│   ├── favicon.svg
+│   └── robots.txt
+├── scripts/
+│   └── lark-test.mjs            # 飞书连通性测试
+└── src/
+    ├── components/              # 共享组件
+    │   ├── Nav.astro
+    │   ├── Footer.astro
+    │   ├── Seal.astro           # 印章
+    │   ├── StatBar.astro        # 数字指标
+    │   ├── PageHero.astro
+    │   ├── LawyerCard.astro
+    │   ├── CaseCard.astro
+    │   └── NewsCard.astro
+    ├── layouts/
+    │   └── BaseLayout.astro
+    ├── lib/
+    │   ├── types.ts             # 全局类型
+    │   ├── lark.ts              # 飞书 API 客户端
+    │   ├── content.ts           # 内容获取层（飞书 → mock 降级）
+    │   └── mock.ts              # 本地 mock 数据
+    ├── pages/
+    │   ├── index.astro          # 首页
+    │   ├── about.astro
+    │   ├── practice.astro
+    │   ├── honors.astro
+    │   ├── social.astro
+    │   ├── contact.astro
+    │   ├── team/
+    │   │   ├── index.astro      # 律师列表
+    │   │   └── [slug].astro     # 律师详情
+    │   ├── cases/
+    │   │   ├── index.astro
+    │   │   └── [slug].astro
+    │   ├── news/
+    │   │   ├── index.astro
+    │   │   └── [slug].astro
+    │   └── rss.xml.ts           # RSS
+    └── styles/
+        └── global.css           # 全局样式（设计系统）
 ```
 
-### `sites/` 设计稿 B：学院派（深 / 浅 / 编辑 三主题切换）
+## 数据源切换
 
-```
-sites/
-├── A-campus/          方案 A — Campus（学院派）
-├── B-modern/          方案 B — Modern（现代派）
-└── C-editorial/       方案 C — Editorial（编辑设计）
-```
+通过 `.env` 的 `CONTENT_SOURCE` 控制：
 
----
+| 值     | 行为                                                             |
+| ------ | ---------------------------------------------------------------- |
+| `auto` | 默认。有 LARK_APP_ID / SECRET / BASE_TOKEN → 用飞书；否则用 mock |
+| `lark` | 强制飞书（凭证缺失会报错）                                       |
+| `mock` | 强制本地 mock（适合 CI / 本地预览）                              |
 
-## 三、目录结构
+## 常用脚本
 
-```
-.
-├── web/                # ★ 官网主仓库（Astro + 飞书 CMS）
-├── docs/
-│   └── FEISHU_CMS.md   # 飞书建表操作指南
-│
-├── site/               # 设计稿 A：墨分五色（东方雅致）
-│   ├── 01-lingnan-yin/
-│   ├── 02-the-counsel/
-│   └── 03-lex-a/
-│
-└── sites/              # 设计稿 B：学院派
-    ├── A-campus/
-    ├── B-modern/
-    └── C-editorial/
-```
+| 命令                | 用途                 |
+| ------------------- | -------------------- |
+| `npm run dev`       | 本地开发             |
+| `npm run build`     | 构建静态站到 `dist/` |
+| `npm run preview`   | 本地预览 build 产物  |
+| `npm run lark:test` | 测试飞书连通性       |
 
----
+## 部署
 
-## 四、技术栈
+支持任意静态托管。推荐：
 
-### `web/` 正式版
+- **Vercel**：导入 Git 仓库即可，自动 build
+- **Netlify**：同上，build command `npm run build`，publish `dist/`
+- **Cloudflare Pages**：同上
+- **阿里云 / 腾讯云 OSS**：先 build，再用 `ossutil` / `coscli` 同步 `dist/`
 
-- **Astro 5.x** 静态站生成器
-- **TypeScript** 全量类型
-- **飞书多维表格 REST API** 作为内容源
-- **本地 mock 兜底**（无凭证/CI/本地预览）
-- **RSS + Sitemap** 内置
-- 字体：Google Fonts（Fraunces / Noto Serif SC / Noto Sans SC / Cormorant）
+详细部署步骤见 [../docs/FEISHU_CMS.md §6](../docs/FEISHU_CMS.md#6-进阶自动重新部署可选)。
 
-### `site/` `sites/` 设计稿
+## 设计系统
 
-- 纯静态 HTML 5 + 原生 CSS + 原生 JavaScript（ES6+）
-- 无构建步骤，不依赖 npm / Node / Webpack
-- 字体走 Google Fonts CDN
+视觉风格参考 `../site/01-lingnan-yin/`（墨分五色）和 kingpound.com：
 
----
+- **颜色**：宣纸米白 `#F5F0E6` + 浓墨 `#1A1714` + 印泥朱砂 `#B53127` + 远山青 `#6B7A5A`
+- **字体**：Fraunces (EN 标题) + Noto Serif SC (ZH) + Cormorant (引文)
+- **印章**：红色方印，所有视觉锚点
+- **大数字指标**：4 个核心数据，黑色背景反衬
+- **零图片**：能用 CSS / SVG / Unicode 实现的不用位图
 
-## 五、本地预览
+## 添加新内容类型
 
-### `web/` 主仓库
+比如要加「出版物」类型：
 
-```bash
-cd web
-npm install
-npm run dev
-# → http://localhost:4321
-```
+1. **类型**：`src/lib/types.ts` 加 `Publication` interface
+2. **mock**：`src/lib/mock.ts` 加 `publications: []`
+3. **content**：`src/lib/content.ts` 加 `mapPublication` + `getPublications()`
+4. **飞书**：在 Base 建 `publications` 表，按字段填
+5. **页面**：`src/pages/publications/index.astro` + `[slug].astro`
+6. **导航**：`src/components/Nav.astro` 加链接
 
-### `site/` `sites/` 设计稿
+## 故障排查
 
-```bash
-# Python 3
-python3 -m http.server 8000
+| 症状                              | 原因                              | 解决                                  |
+| --------------------------------- | --------------------------------- | ------------------------------------- |
+| build 报 `LARK_BASE_TOKEN 未配置` | `CONTENT_SOURCE=lark` 但 env 没配 | 改成 `auto` 或填凭证                  |
+| 首页 4 个大数字全为 0             | `site_config` 表里没数据          | 走 mock / 在飞书填 26 个 key          |
+| 案例详情页 404                    | `slug` 没填或写错                 | 检查飞书表里 `slug` 字段              |
+| 律师头像不显示                    | 没传附件                          | 上传图片到 `avatar` 字段              |
+| 表单提交失败                      | 没配 formspree / 后端             | `src/pages/contact.astro` 改 `action` |
 
-# Node.js
-npx --yes serve .
-```
+## License & 版权
 
-然后浏览器访问：
-
-- 设计稿 A：http://localhost:8000/site/01-lingnan-yin/
-- 设计稿 B：http://localhost:8000/sites/A-campus/
-
----
-
-## 六、浏览器兼容性
-
-| 浏览器        | 最低版本 | `web/` | `site/` | `sites/` |
-| ------------- | -------- | ------ | ------- | -------- |
-| Chrome / Edge | 90+      | ✅     | ✅      | ✅       |
-| Safari        | 14+      | ✅     | ✅      | ✅       |
-| Firefox       | 88+      | ✅     | ✅      | ✅       |
-| IE            | ❌        | ❌      | ❌      | ❌        |
-
----
-
-## 七、开发约定
-
-- **不动顶层结构**：`web/` 是正式版，`site/` `sites/` 是设计稿，新增加内容请放 `web/src/`
-- **设计稿互不依赖**：`site/` 和 `sites/` 两组设计稿各自独立、各自完整
-- **字体走 Google Fonts CDN**
-- **图禁用图片优先**：能用 CSS / Unicode / SVG 实现的就不放位图
-- **不要提交**：
-  - `.DS_Store`（已加 .gitignore）
-  - `web/node_modules/`（已加 .gitignore）
-  - `web/.env`（已加 .gitignore，含飞书凭证）
-  - `web/.cache/`（飞书数据缓存）
-  - `web/dist/`（构建产物）
-  - `web/.astro/`（Astro 临时）
-  - `.netlify/state.json`（已加 .gitignore）
-  - 个人编辑器配置（`.vscode/`、`.idea/` 已加 .gitignore）
-
----
-
-## 八、版权与许可
-
-本站点（含文字、设计稿、HTML / CSS / JS 源码、静态资源、文档等）的全部权利归属 **陈恒律师** 个人所有。
-未经权利人书面授权，请勿公开传播、转载、再发布或用于任何商业用途。
-
-如需使用源码、复用设计稿或对外展示，请先与权利人确认授权范围与方式。
+源码、设计稿、文档的全部权利归陈恒律师个人所有。未经书面授权请勿公开传播或商用。

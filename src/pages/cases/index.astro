@@ -1,0 +1,178 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import SectionHeader from '~/components/SectionHeader.astro';
+import CaseCard from '~/components/CaseCard.astro';
+import { getCases } from '~/lib/content';
+import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
+const allCases = await getCases();
+const areas = Array.from(
+  new Set(
+    allCases
+      .map((c) => t(c.practiceArea, locale) ?? c.practiceArea?.zh)
+      .filter((s): s is string => !!s),
+  ),
+);
+
+const allLabel = t({ zh: '全部', en: 'All' }, locale);
+const emptyLabel = t(
+  { zh: '该业务领域暂无案例。', en: 'No matters in this practice area.' },
+  locale,
+);
+---
+
+<BaseLayout title={t({ zh: '业绩案例', en: 'Selected Works' }, locale)}>
+  <section class="section--tight">
+    <div class="container">
+      <SectionHeader
+        eyebrow={{ zh: 'Works · 业绩', en: 'Works' }}
+        title={{
+          zh: '代表案例 · 以案观所',
+          en: 'Selected Representations · A View of the Firm',
+        }}
+        lede={{
+          zh: '每一个案件都是一份责任的兑现。',
+          en: 'Every matter is the discharge of a duty.',
+        }}
+        locale={locale}
+      />
+    </div>
+  </section>
+
+  <section class="section--tight" style="padding-top: 0;">
+    <div class="container">
+      {
+        allCases.length === 0 ? (
+          <p class="muted" style="text-align: center; padding: 80px 0;">
+            {t({ zh: '案例内容筹备中。', en: 'Content is being prepared.' }, locale)}
+          </p>
+        ) : (
+          <>
+            {areas.length > 0 && (
+              <div
+                class="case-filter"
+                role="tablist"
+                aria-label={t({ zh: '业务领域筛选', en: 'Filter by practice area' }, locale)}
+              >
+                <button
+                  type="button"
+                  class="case-filter__btn is-active"
+                  data-filter="*"
+                  role="tab"
+                  aria-selected="true"
+                >
+                  {allLabel} <span class="case-filter__count">({allCases.length})</span>
+                </button>
+                {areas.map((a) => {
+                  const count = allCases.filter(
+                    (c) => (t(c.practiceArea, locale) ?? c.practiceArea?.zh) === a,
+                  ).length;
+                  return (
+                    <button
+                      type="button"
+                      class="case-filter__btn"
+                      data-filter={a}
+                      role="tab"
+                      aria-selected="false"
+                    >
+                      {a} <span class="case-filter__count">({count})</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            <div class="grid grid--3 case-grid" data-case-grid>
+              {allCases.map((c) => (
+                <CaseCard case={c} locale={locale} />
+              ))}
+            </div>
+            <p class="case-empty" data-case-empty hidden>
+              {emptyLabel}
+            </p>
+          </>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-case-grid]').forEach((grid) => {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.case-filter__btn');
+    const items = Array.from(grid.querySelectorAll<HTMLElement>('.case-card-link'));
+    const empty = document.querySelector<HTMLElement>('[data-case-empty]');
+
+    function apply(filter: string) {
+      let visible = 0;
+      items.forEach((el) => {
+        const area = el.dataset.practice ?? '';
+        const show = filter === '*' || area === filter;
+        el.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      if (empty) empty.hidden = visible !== 0;
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => {
+          b.classList.toggle('is-active', b === btn);
+          b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+        });
+        apply(btn.dataset.filter || '*');
+      });
+    });
+  });
+</script>
+
+<style>
+  .case-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+  .case-filter__btn {
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: var(--bg-2);
+    color: var(--ink);
+    border: 1px solid var(--rule-soft);
+    font-family: var(--serif-zh);
+    font-size: 14px;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+  .case-filter__btn:hover {
+    border-color: var(--ink);
+    transform: translateY(-1px);
+  }
+  .case-filter__btn.is-active {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+  .case-filter__btn.is-active .case-filter__count {
+    color: rgba(245, 240, 230, 0.7);
+  }
+  .case-filter__count {
+    font-family: var(--serif-en);
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .case-empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+</style>

@@ -1,0 +1,727 @@
+---
+/**
+ * 案例详情页（案卷打开式 / 方案 B）
+ *  结构：
+ *    1. Hero（卷宗封面）：标签条 + 巨型标题 + 胜诉印章 + 4 列元数据网格
+ *    2. 案情三幕剧：01/02/03 大数字 + 中英小标题 + 正文
+ *    3. 亮点 + 团队：左右两栏，左 highlight 卡片 / 右 律师卡
+ *    4. 相关案例（同 practiceArea 2-3 张）
+ *    5. 委托咨询大 CTA
+ */
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import CaseSeal from '~/components/CaseSeal.astro';
+import CaseCard from '~/components/CaseCard.astro';
+import { getCases, getCaseBySlug, getLawyers, getRelatedCases } from '~/lib/content';
+import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+export async function getStaticPaths() {
+  const cases = await getCases();
+  const paths: any[] = [];
+  for (const locale of ['zh', 'en'] as const) {
+    for (const c of cases) {
+      paths.push({
+        params: { slug: c.slug },
+        props: { caseSlug: c.slug, locale },
+      });
+    }
+  }
+  return paths;
+}
+
+const { caseSlug } = Astro.props as { caseSlug: string; locale: Locale };
+const locale: Locale =
+  Astro.url.pathname.startsWith('/en/') || Astro.url.pathname === '/en' ? 'en' : DEFAULT_LOCALE;
+const c = await getCaseBySlug(caseSlug);
+if (!c) return Astro.redirect(`/${locale}/cases`);
+
+const allLawyers = await getLawyers();
+const leadLawyer = c.leadLawyerId ? allLawyers.find((l) => l.id === c.leadLawyerId) : undefined;
+const otherLawyers = (c.lawyerIds ?? [])
+  .filter((id) => id !== c.leadLawyerId)
+  .map((id) => allLawyers.find((l) => l.id === id))
+  .filter(Boolean) as typeof allLawyers;
+const related = await getRelatedCases(c.slug, 3);
+
+const outcome = c.outcome ?? 'win';
+const back = t({ zh: '返回案例列表', en: 'Back to Works' }, locale);
+const inquire = t({ zh: '就此咨询', en: 'Inquire' }, locale);
+const sections = [
+  {
+    num: '01',
+    label: t({ zh: '案情背景', en: 'Background' }, locale),
+    en: 'Background',
+    key: 'background' as const,
+  },
+  {
+    num: '02',
+    label: t({ zh: '律师介入', en: 'Approach' }, locale),
+    en: 'Approach',
+    key: 'approach' as const,
+  },
+  {
+    num: '03',
+    label: t({ zh: '客户收获', en: 'Result' }, locale),
+    en: 'Result',
+    key: 'result' as const,
+  },
+];
+const highlights = c.highlights ? ta(c.highlights, locale) : [];
+const em = c.extraMeta;
+---
+
+<BaseLayout title={t(c.title, locale) ?? ''} description={t(c.summary, locale)}>
+  <article class="case-detail">
+    {/* ===================== 1. HERO 卷宗封面 ===================== */}
+    <header class="cd-hero">
+      <div class="container">
+        <a href={`/${locale}/cases`} class="cd-back">← {back}</a>
+
+        <div class="cd-hero__inner">
+          <div class="cd-hero__main">
+            <div class="cd-hero__tags">
+              <span class="tag tag--seal">{t(c.practiceArea, locale) ?? '—'}</span>
+              <span class="tag">{t(c.type, locale)}</span>
+              <span class="tag">{c.year}</span>
+              {t(c.industry, locale) && <span class="tag">{t(c.industry, locale)}</span>}
+            </div>
+
+            <div class="cd-hero__eyebrow">
+              <span class="eyebrow-rule eyebrow-rule--seal">
+                {t({ zh: '案卷 · Case File', en: 'Case File' }, locale)}
+              </span>
+            </div>
+
+            <h1 class="cd-hero__title">{t(c.title, locale)}</h1>
+            <p class="cd-hero__lede">{t(c.summary, locale)}</p>
+          </div>
+
+          <div class="cd-hero__seal-anchor">
+            <CaseSeal outcome={outcome} size="lg" locale={locale} />
+          </div>
+        </div>
+
+        {
+          em && (em.caseNo || em.amount || em.stats) && (
+            <div class="cd-hero__meta">
+              {em.caseNo && (
+                <div class="cd-hero__meta-cell">
+                  <div class="cd-hero__meta-key">{t({ zh: '案号', en: 'Case No.' }, locale)}</div>
+                  <div class="cd-hero__meta-val">{em.caseNo}</div>
+                </div>
+              )}
+              {em.amount && (
+                <div class="cd-hero__meta-cell">
+                  <div class="cd-hero__meta-key">
+                    {t({ zh: '标的 / 规模', en: 'Amount / Scale' }, locale)}
+                  </div>
+                  <div class="cd-hero__meta-val">{em.amount}</div>
+                </div>
+              )}
+              {em.stats && (
+                <div class="cd-hero__meta-cell">
+                  <div class="cd-hero__meta-key">
+                    {t({ zh: '关键结果', en: 'Key Result' }, locale)}
+                  </div>
+                  <div class="cd-hero__meta-val">{em.stats}</div>
+                </div>
+              )}
+              {leadLawyer && (
+                <div class="cd-hero__meta-cell">
+                  <div class="cd-hero__meta-key">
+                    {t({ zh: '主办律师', en: 'Lead Counsel' }, locale)}
+                  </div>
+                  <div class="cd-hero__meta-val">
+                    <a href={`/${locale}/team/${leadLawyer.slug}`}>{t(leadLawyer.name, locale)}</a>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        }
+      </div>
+    </header>
+
+    {/* ===================== 2. 案情三幕剧 ===================== */}
+    <section class="cd-story">
+      <div class="container">
+        {
+          sections.map((s, i) => (
+            <article class="cd-scene" data-scene={i}>
+              <div class="cd-scene__num" aria-hidden="true">
+                {s.num}
+              </div>
+              <div class="cd-scene__body">
+                <div class="cd-scene__head">
+                  <h2 class="cd-scene__label-zh">{s.label}</h2>
+                  <span class="cd-scene__label-en">{s.en}</span>
+                </div>
+                <p class="cd-scene__text">{t(c[s.key], locale)}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    {/* ===================== 4. 亮点 + 团队（左右两栏） ===================== */}
+    {
+      (highlights.length > 0 || leadLawyer || otherLawyers.length > 0) && (
+        <section class="cd-split">
+          <div class="container">
+            <div class="cd-split__grid">
+              {/* 左栏：亮点 */}
+              {highlights.length > 0 && (
+                <div class="cd-split__col cd-split__col--evidence">
+                  <div class="cd-section-head cd-section-head--center cd-section-head--eyebrow">
+                    <span class="eyebrow eyebrow-rule eyebrow-rule--seal">
+                      {t({ zh: '本案亮点 · Highlights', en: 'Highlights' }, locale)}
+                    </span>
+                  </div>
+                  <ul class="cd-evidence__list">
+                    {highlights.map((h, i) => (
+                      <li class="cd-evidence__item">
+                        <span class="cd-evidence__no">0{i + 1}</span>
+                        <span class="cd-evidence__text">{h}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* 右栏：团队 */}
+              {(leadLawyer || otherLawyers.length > 0) && (
+                <div class="cd-split__col cd-split__col--team">
+                  <div class="cd-section-head cd-section-head--center cd-section-head--eyebrow">
+                    <span class="eyebrow eyebrow-rule">
+                      {t({ zh: '由谁守护 · Case Team', en: 'Case Team' }, locale)}
+                    </span>
+                  </div>
+                  <ul class="cd-team__list">
+                    {leadLawyer && (
+                      <li class="cd-team__card cd-team__card--lead">
+                        <a href={`/${locale}/team/${leadLawyer.slug}`} class="cd-team__link">
+                          {leadLawyer.avatar && (
+                            <img
+                              class="cd-team__avatar"
+                              src={leadLawyer.avatar}
+                              alt={t(leadLawyer.name, locale)}
+                              loading="lazy"
+                            />
+                          )}
+                          <div class="cd-team__body">
+                            <span class="cd-team__role">
+                              {t({ zh: '主理律师', en: 'Lead Counsel' }, locale)}
+                            </span>
+                            <span class="cd-team__name">{t(leadLawyer.name, locale)}</span>
+                            <span class="cd-team__level">{t(leadLawyer.level, locale)}</span>
+                            <span class="cd-team__cta">
+                              {t({ zh: '查看律师主页', en: 'View Profile' }, locale)} →
+                            </span>
+                          </div>
+                        </a>
+                      </li>
+                    )}
+                    {otherLawyers.map((l) => (
+                      <li class="cd-team__card">
+                        <a href={`/${locale}/team/${l.slug}`} class="cd-team__link">
+                          {l.avatar && (
+                            <img
+                              class="cd-team__avatar"
+                              src={l.avatar}
+                              alt={t(l.name, locale)}
+                              loading="lazy"
+                            />
+                          )}
+                          <div class="cd-team__body">
+                            <span class="cd-team__role">
+                              {t({ zh: '协办律师', en: 'Co-Counsel' }, locale)}
+                            </span>
+                            <span class="cd-team__name">{t(l.name, locale)}</span>
+                            <span class="cd-team__level">{t(l.level, locale)}</span>
+                            <span class="cd-team__cta">→</span>
+                          </div>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    {/* ===================== 6. 相关案例 ===================== */}
+    {
+      related.length > 0 && (
+        <section class="cd-related">
+          <div class="container">
+            <div class="cd-section-head cd-section-head--center cd-section-head--eyebrow">
+              <span class="eyebrow eyebrow-rule">
+                {t(
+                  {
+                    zh: '其他相关案例 · Related Matters',
+                    en: 'Related Matters',
+                  },
+                  locale,
+                )}
+              </span>
+            </div>
+            <div class="grid grid--3">
+              {related.map((rc) => (
+                <CaseCard case={rc} locale={locale} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    {/* ===================== 7. CTA ===================== */}
+    <section class="cd-cta">
+      <div class="container">
+        <div class="cd-cta__inner">
+          <span class="eyebrow-rule eyebrow-rule--seal">
+            {t({ zh: '就此咨询 · Inquire', en: 'Inquire' }, locale)}
+          </span>
+          <h2 class="cd-cta__title">
+            {
+              t(
+                {
+                  zh: '类似案情，让我们为你做一次专业评估。',
+                  en: 'A similar matter? Let us evaluate it for you.',
+                },
+                locale,
+              )
+            }
+          </h2>
+          <a href={`/${locale}/contact`} class="btn btn--seal btn--lg">{inquire} →</a>
+        </div>
+      </div>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .case-detail {
+    background: var(--bg);
+  }
+
+  /* ========== HERO ========== */
+  .cd-hero {
+    position: relative;
+    padding: 64px 0 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .cd-back {
+    display: inline-block;
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+  .cd-back:hover {
+    color: var(--ink);
+  }
+  .cd-hero__inner {
+    position: relative;
+    padding: 8px 0 48px;
+  }
+  .cd-hero__main {
+    max-width: 820px;
+  }
+  .cd-hero__tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .cd-hero__eyebrow {
+    margin-bottom: 20px;
+  }
+  .cd-hero__title {
+    font-family: var(--serif-zh);
+    font-weight: 500;
+    font-size: clamp(36px, 5.5vw, 72px);
+    line-height: 1.15;
+    letter-spacing: 0.005em;
+    margin: 0 0 28px;
+    color: var(--ink);
+  }
+  .cd-hero__lede {
+    font-size: 18px;
+    line-height: 1.85;
+    color: var(--ink-soft);
+    max-width: 720px;
+    margin: 0;
+  }
+  .cd-hero__seal-anchor {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 140px;
+    height: 140px; /* 等于印章 size=lg 直径 */
+  }
+  @media (max-width: 768px) {
+    .cd-hero__seal-anchor {
+      top: 8px;
+      right: 8px;
+      width: 100px;
+      height: 100px;
+    }
+  }
+  .cd-hero__meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin: 0;
+    padding: 28px 0 36px;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .cd-hero__meta-cell {
+    padding: 0 24px;
+    border-left: 1px solid var(--rule-soft);
+  }
+  .cd-hero__meta-cell:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .cd-hero__meta-cell .cd-hero__meta-key {
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 10px;
+  }
+  .cd-hero__meta-cell .cd-hero__meta-val {
+    font-family: var(--serif-zh);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .cd-hero__meta-cell a {
+    color: var(--ink);
+    border-bottom: 1px solid var(--seal);
+  }
+  .cd-hero__meta-cell a:hover {
+    color: var(--seal);
+  }
+
+  @media (max-width: 768px) {
+    .cd-hero {
+      padding-top: 40px;
+    }
+    .cd-hero__meta {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px 0;
+      padding: 24px 0;
+    }
+    .cd-hero__meta-cell {
+      padding: 0 12px;
+    }
+    .cd-hero__meta-cell:nth-child(odd) {
+      border-left: 0;
+      padding-left: 0;
+    }
+    .cd-hero__meta-cell:nth-child(even) {
+      border-left: 1px solid var(--rule-soft);
+    }
+    .cd-hero__seal-wrap {
+      top: -20px;
+    }
+  }
+
+  /* ========== 案情三幕剧（左编号 + 右内容，整体居中） ========== */
+  .cd-story {
+    padding: clamp(40px, 5vw, 64px) 0;
+  }
+  .cd-story .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .cd-scene {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 720px);
+    gap: clamp(24px, 4vw, 48px);
+    padding: clamp(28px, 3.5vw, 44px) 0;
+    border-top: 1px solid var(--rule-soft);
+    align-items: start;
+  }
+  .cd-scene:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .cd-scene__num {
+    font-family: var(--serif-en);
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--seal);
+    letter-spacing: 0.02em;
+  }
+  .cd-scene__body {
+    min-width: 0;
+  }
+  .cd-scene__head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .cd-scene__label-zh {
+    font-family: var(--serif-zh);
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 1.3;
+    color: var(--ink);
+    margin: 0;
+  }
+  .cd-scene__label-en {
+    font-family: var(--serif-en);
+    font-style: italic;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .cd-scene__text {
+    font-family: var(--serif-zh);
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--ink);
+    margin: 0;
+  }
+  @media (max-width: 768px) {
+    .cd-scene {
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 20px;
+      width: 100%;
+    }
+    .cd-scene__num {
+      font-size: 36px;
+    }
+    .cd-scene__label-zh {
+      font-size: 18px;
+    }
+  }
+
+  /* ========== 通用 section head ========== */
+  .cd-section-head {
+    margin-bottom: 48px;
+  }
+  .cd-section-head .eyebrow {
+    margin-bottom: 16px;
+  }
+  .cd-section-head .h2 {
+    font-family: var(--serif-zh);
+    font-weight: 500;
+    font-size: clamp(28px, 3.6vw, 44px);
+    line-height: 1.3;
+    color: var(--ink);
+    margin: 0;
+  }
+  /* 居中放大版（亮点 / 团队区块用） */
+  .cd-section-head--center {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .cd-section-head--center .eyebrow {
+    justify-content: center;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .cd-section-head--center .h2 {
+    font-size: clamp(32px, 4.2vw, 56px);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+  /* 只用 eyebrow 作为唯一标题（无 h2）：放大并加粗 */
+  .cd-section-head--eyebrow {
+    margin-bottom: 80px;
+  }
+  .cd-section-head--eyebrow .eyebrow {
+    font-family: var(--serif-zh);
+    font-size: clamp(20px, 2.2vw, 28px);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    margin-bottom: 0;
+  }
+  .cd-section-head--eyebrow .eyebrow::before,
+  .cd-section-head--eyebrow .eyebrow::after {
+    flex: 0 0 32px;
+    height: 1px;
+  }
+
+  /* ========== 亮点 + 团队（左右两栏） ========== */
+  .cd-split {
+    background: var(--bg-2);
+    padding: clamp(60px, 8vw, 100px) 0;
+  }
+  .cd-split__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 5vw, 64px);
+  }
+  .cd-split__col--evidence {
+    padding-right: clamp(0px, 2vw, 32px);
+    border-right: 1px solid var(--rule);
+  }
+  @media (max-width: 900px) {
+    .cd-split__grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .cd-split__col--evidence {
+      padding-right: 0;
+      border-right: 0;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--rule);
+    }
+  }
+
+  /* 亮点列表（左栏） */
+  .cd-evidence__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+  }
+  .cd-evidence__item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 16px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .cd-evidence__no {
+    font-family: var(--serif-en);
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--seal);
+    line-height: 1;
+    padding-top: 4px;
+  }
+  .cd-evidence__text {
+    font-family: var(--serif-zh);
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--ink);
+  }
+
+  /* 团队列表（右栏） */
+  .cd-team__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .cd-team__card {
+    background: var(--bg);
+    border: 1px solid var(--rule-soft);
+    transition:
+      border-color 0.25s,
+      transform 0.25s,
+      box-shadow 0.25s;
+  }
+  .cd-team__card:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+  }
+  .cd-team__card--lead {
+    border-color: var(--ink);
+  }
+  .cd-team__link {
+    display: flex;
+    gap: 20px;
+    padding: 24px;
+    align-items: center;
+  }
+  .cd-team__link:hover {
+    text-decoration: none;
+  }
+  .cd-team__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: var(--bg-2);
+  }
+  .cd-team__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+  }
+  .cd-team__role {
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--seal);
+  }
+  .cd-team__name {
+    font-family: var(--serif-zh);
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--ink);
+  }
+  .cd-team__level {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .cd-team__cta {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .cd-team__card--lead .cd-team__cta {
+    color: var(--seal);
+  }
+
+  /* ========== 相关案例 ========== */
+  .cd-related {
+    background: var(--bg-2);
+    padding: clamp(60px, 8vw, 100px) 0;
+  }
+
+  /* ========== CTA ========== */
+  .cd-cta {
+    background: var(--ink);
+    color: var(--bg);
+    padding: clamp(100px, 12vw, 160px) 0;
+    text-align: center;
+  }
+  .cd-cta__inner {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .cd-cta__inner .eyebrow-rule {
+    color: var(--seal);
+  }
+  .cd-cta__title {
+    font-family: var(--serif-zh);
+    font-weight: 400;
+    font-size: clamp(24px, 2.8vw, 36px);
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    color: var(--bg);
+    margin: 24px 0 44px;
+  }
+  .cd-cta .btn--seal {
+    padding: 16px 36px;
+    font-size: 15px;
+  }
+</style>

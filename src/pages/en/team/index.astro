@@ -1,0 +1,69 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import SectionHeader from '~/components/SectionHeader.astro';
+import LawyerCard from '~/components/LawyerCard.astro';
+import { getLawyers } from '~/lib/content';
+import { t, type Locale } from '~/i18n';
+
+const locale: Locale = 'en' as const;
+const lawyers = await getLawyers();
+const partners = lawyers.filter(
+  (l) =>
+    (t(l.level, locale) ?? '').toLowerCase().includes('partner') ||
+    t(l.level, locale)?.includes('合伙人'),
+);
+const others = lawyers.filter((l) => !partners.includes(l));
+---
+
+<BaseLayout title={t({ zh: '专业人员', en: 'Counsel' }, locale)}>
+  <section class="section--tight">
+    <div class="container">
+      <SectionHeader
+        eyebrow={{ zh: 'Counsel · 律师', en: 'Counsel' }}
+        title={{
+          zh: '汇聚精英 · 协作共进',
+          en: 'Depth in Counsel · Synergy in Practice',
+        }}
+        lede={{
+          zh: '深度洞察，集体智慧；为客户提供高品质法律服务。',
+          en: 'Deep insight, collective wisdom.',
+        }}
+        locale={locale}
+      />
+    </div>
+  </section>
+
+  {
+    partners.length > 0 && (
+      <section class="section--tight" style="padding-top: 0;">
+        <div class="container">
+          <h2 class="eyebrow eyebrow-rule" style="font-size: 14px; margin-bottom: 32px;">
+            {t({ zh: '合伙人 · Partners', en: 'Partners' }, locale)}
+          </h2>
+          <div class="grid grid--3">
+            {partners.map((l) => (
+              <LawyerCard lawyer={l} locale="en" />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    others.length > 0 && (
+      <section class="section--tight">
+        <div class="container">
+          <h2 class="eyebrow eyebrow-rule" style="font-size: 14px; margin-bottom: 32px;">
+            {t({ zh: '资深律师 · Senior Counsels', en: 'Senior Counsels' }, locale)}
+          </h2>
+          <div class="grid grid--3">
+            {others.map((l) => (
+              <LawyerCard lawyer={l} locale="en" />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>

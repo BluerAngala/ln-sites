@@ -1,0 +1,86 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import SectionHeader from '~/components/SectionHeader.astro';
+import NewsCard from '~/components/NewsCard.astro';
+import { getNews } from '~/lib/content';
+import { t, type Locale } from '~/i18n';
+
+const locale: Locale = 'en' as const;
+const allNews = await getNews();
+const [first, ...rest] = allNews;
+---
+
+<BaseLayout title={t({ zh: '新闻动态', en: 'News' }, locale)}>
+  <section class="section--tight">
+    <div class="container">
+      <SectionHeader
+        eyebrow={{ zh: 'News · 资讯', en: 'News' }}
+        title={{ zh: '观所内风云 · 察行业潮涌', en: 'Inside the Firm · Beyond the Bar' }}
+        locale={locale}
+      />
+    </div>
+  </section>
+
+  />
+
+  <section class="section--tight" style="padding-top: 0;">
+    <div class="container">
+      {
+        allNews.length === 0 ? (
+          <p class="muted" style="text-align: center; padding: 80px 0;">
+            {t({ zh: '暂无内容。', en: 'No content yet.' }, locale)}
+          </p>
+        ) : (
+          <>
+            {first && (
+              <a
+                href={`/${locale}/news/${first.slug}`}
+                class="news-feature card"
+                style="margin-bottom: 60px;"
+              >
+                <div class="news-feature__meta">
+                  <span class="tag tag--seal">
+                    {t({ zh: '置顶', en: 'Featured' }, locale)} · {t(first.category, locale)}
+                  </span>
+                  <span class="muted" style="font-family: var(--serif-en); font-size: 13px;">
+                    {first.date}
+                  </span>
+                </div>
+                <h2 class="card__title" style="font-size: 32px; margin-top: 16px;">
+                  {t(first.title, locale)}
+                </h2>
+                <p class="card__excerpt" style="font-size: 16px; max-width: 720px;">
+                  {t(first.summary, locale)}
+                </p>
+                <div class="card__cta">{t({ zh: '阅读全文', en: 'Read More' }, locale)} →</div>
+              </a>
+            )}
+
+            {rest.length > 0 && (
+              <div class="grid grid--3">
+                {rest.map((n) => (
+                  <NewsCard news={n} locale="en" />
+                ))}
+              </div>
+            )}
+          </>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .news-feature {
+    display: block;
+    padding: 48px;
+  }
+  .news-feature:hover {
+    text-decoration: none;
+  }
+  .news-feature__meta {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+</style>

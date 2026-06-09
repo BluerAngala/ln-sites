@@ -1,0 +1,387 @@
+---
+import type { Lawyer, I18n } from '~/lib/types';
+import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import SectionHeader from '~/components/SectionHeader.astro';
+
+interface Props {
+  lawyers: Lawyer[];
+  title?: I18n<string>;
+  eyebrow?: I18n<string>;
+  lede?: I18n<string>;
+  locale?: Locale;
+}
+const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const {
+  lawyers,
+  title = { zh: '执业律师', en: 'Attorneys at Law' },
+  eyebrow = { zh: '专业人员', en: 'Counsel' },
+  lede,
+} = Astro.props;
+const ledeText = lede ? (t(lede, locale) ?? '') : '';
+const prefix = locale === 'en' ? '/en' : '';
+---
+
+<section class="lawyer-carousel" id="counsel">
+  <div class="container">
+    <div class="lc__head">
+      <SectionHeader eyebrow={eyebrow} title={title} align="center" locale={locale} />
+      {ledeText && <p class="lc__lede">{ledeText}</p>}
+    </div>
+
+    <div class="lc__viewport">
+      <ul class="lc__track">
+        {
+          lawyers.map((l) => (
+            <li class="lc__slide">
+              <a class="lp" href={`${prefix}/team/${l.slug}`}>
+                <figure class="lp__photo">
+                  {l.avatar ? (
+                    <img src={l.avatar} alt={t(l.name, locale) ?? ''} loading="lazy" />
+                  ) : (
+                    <div class="lp__photo-fallback">
+                      <span>{(t(l.name, locale) ?? '?').charAt(0)}</span>
+                    </div>
+                  )}
+                  <span class="lp__photo-deco" aria-hidden="true" />
+                  <figcaption class="lp__overlay">
+                    <span class="lp__office-tag">{t(l.office, locale)}</span>
+                  </figcaption>
+                </figure>
+                <div class="lp__caption">
+                  <div class="lp__info">
+                    <h3 class="lp__name">
+                      <span class="lp__name-zh">{t(l.name, locale)}</span>
+                      {locale === 'en' && <span class="lp__name-en">{l.name.zh}</span>}
+                    </h3>
+                    <div class="lp__level">{t(l.level, locale)}</div>
+                    <div class="lp__areas">
+                      {ta(l.practiceAreas, locale)
+                        .slice(0, 2)
+                        .map((area) => (
+                          <span class="lp__area">{area}</span>
+                        ))}
+                    </div>
+                  </div>
+                  <span class="lp__cta">
+                    <span class="lp__cta-zh">{locale === 'en' ? 'View Profile' : '查看简介'}</span>
+                    <span class="lp__cta-arrow" aria-hidden="true">
+                      →
+                    </span>
+                  </span>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lawyer-carousel {
+    padding: clamp(56px, 7vw, 96px) 0 clamp(72px, 9vw, 120px);
+    background: var(--bg-soft);
+  }
+  .lc__head {
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .lc__lede {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--ink-soft);
+    margin: 0 auto 48px;
+    max-width: 560px;
+  }
+
+  /* Viewport + track */
+  .lc__viewport {
+    overflow: hidden;
+    margin: 0 calc(var(--pad-x) * -1);
+    padding: 0 var(--pad-x);
+  }
+  .lc__track {
+    display: flex;
+    gap: 32px;
+    will-change: transform;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .lc__slide {
+    flex: 0 0 calc((100% - 64px) / 3);
+    min-width: 0;
+  }
+  @media (max-width: 900px) {
+    .lc__slide {
+      flex: 0 0 calc((100% - 32px) / 2);
+    }
+  }
+  @media (max-width: 600px) {
+    .lc__slide {
+      flex: 0 0 100%;
+    }
+  }
+
+  /* Card */
+  .lp {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+  }
+  .lp__photo {
+    position: relative;
+    margin: 0;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--bg-2);
+  }
+  .lp__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    transition:
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+      filter 0.5s;
+    filter: grayscale(8%);
+  }
+  .lp:hover .lp__photo img {
+    transform: scale(1.04);
+    filter: grayscale(0%);
+  }
+
+  /* 装饰边框:右下角断线(签名感) */
+  .lp__photo-deco {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 36px;
+    height: 36px;
+    pointer-events: none;
+  }
+  .lp__photo-deco::before {
+    content: '';
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 12px;
+    height: 1px;
+    background: var(--bg);
+    opacity: 0.6;
+  }
+  .lp__photo-deco::after {
+    content: '';
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 1px;
+    height: 12px;
+    background: var(--bg);
+    opacity: 0.6;
+  }
+
+  /* 顶部到中部渐变蒙版(让头像不抢眼 + office tag 可读) */
+  .lp__photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+    pointer-events: none;
+  }
+
+  /* 浮动 office 角标 */
+  .lp__overlay {
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    margin: 0;
+  }
+  .lp__office-tag {
+    display: inline-block;
+    padding: 5px 10px;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    font-weight: 500;
+  }
+
+  .lp__photo-fallback {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    background: var(--bg-2);
+  }
+  .lp__photo-fallback span {
+    font-family: var(--serif-zh);
+    font-weight: 200;
+    font-size: 96px;
+    color: var(--ink-soft);
+  }
+
+  /* Caption block below photo */
+  .lp__caption {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: end;
+    padding: 32px 0 0;
+  }
+  .lp__info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .lp__name {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .lp__name-zh {
+    font-family: var(--serif-zh);
+    font-weight: 500;
+    font-size: 36px;
+    letter-spacing: 0.01em;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .lp__name-en {
+    font-family: var(--serif-en);
+    font-size: 15px;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .lp__level {
+    font-size: 16px;
+    color: var(--seal);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .lp__areas {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+  }
+  .lp__area {
+    font-size: 17px;
+    color: var(--ink-soft);
+  }
+  .lp__area:not(:last-child)::after {
+    content: '·';
+    margin-left: 10px;
+    color: var(--ink-soft);
+  }
+
+  /* 查看简介按钮：seal 印章红 + 内框白线（与 hero 主按钮同款） */
+  .lp__cta {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 24px;
+    background: var(--seal);
+    color: var(--bg);
+    border: 1px solid var(--seal);
+    font-family: var(--serif-zh);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    transition:
+      background 0.3s ease,
+      transform 0.3s ease;
+  }
+  .lp__cta::before {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1px solid rgba(245, 240, 230, 0.55);
+    pointer-events: none;
+    transition:
+      inset 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .lp__cta-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+  .lp:hover .lp__cta {
+    background: var(--seal-deep);
+    transform: translateY(-1px);
+  }
+  .lp:hover .lp__cta::before {
+    inset: 6px;
+    border-color: rgba(245, 240, 230, 0.8);
+  }
+  .lp:hover .lp__cta-arrow {
+    transform: translateX(4px);
+  }
+</style>
+
+<script>
+  // 轮播：marquee 风格持续向左滚动 + 无限循环 + 仅在律师卡上悬停暂停
+  const carousel = document.querySelector('.lawyer-carousel');
+  if (carousel) {
+    const track = carousel.querySelector('.lc__track') as HTMLElement | null;
+    if (track) {
+      // 把原始一组 slides 复制一份拼到末尾，让视觉上"无限循环"
+      const originals = Array.from(track.children) as HTMLElement[];
+      originals.forEach((node) => track.appendChild(node.cloneNode(true)));
+
+      const SPEED = 110; // px/s（更快的 marquee）
+      let offset = 0; // 当前 translateX
+      let auto = true; // 是否在滚动
+      let last = performance.now();
+
+      const tick = (now: number) => {
+        const dt = now - last;
+        last = now;
+        if (auto) {
+          offset -= (SPEED * dt) / 1000;
+          const half = track.scrollWidth / 2;
+          // 走过一组 slides 长度后，瞬时"接回"开头（视觉无缝）
+          if (-offset >= half) offset += half;
+          track.style.transform = `translateX(${offset}px)`;
+        }
+        requestAnimationFrame(tick);
+      };
+
+      // 鼠标仅在律师卡（.lp）上才暂停；离开律师卡即续播
+      const inCard = (target: EventTarget | null) =>
+        !!(target as HTMLElement | null)?.closest?.('.lp');
+
+      track.addEventListener('mouseover', (e) => {
+        if (inCard(e.target)) auto = false;
+      });
+      track.addEventListener('mouseout', (e) => {
+        const leaving = inCard(e.target);
+        const enteringCard = inCard(e.relatedTarget);
+        if (leaving && !enteringCard) {
+          auto = true;
+          last = performance.now();
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) auto = false;
+        else {
+          auto = true;
+          last = performance.now();
+        }
+      });
+
+      requestAnimationFrame(tick);
+    }
+  }
+</script>

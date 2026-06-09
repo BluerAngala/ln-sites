@@ -1,0 +1,74 @@
+---
+import type { Lawyer } from '~/lib/types';
+import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+
+interface Props {
+  lawyer: Lawyer;
+  compact?: boolean;
+  locale?: Locale;
+}
+const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const l = Astro.props.lawyer;
+const initial = (t(l.name, locale) ?? '?').charAt(0);
+---
+
+<a class="lawyer-card-link" href={`${locale === 'en' ? '/en' : ''}/team/${l.slug}`}>
+  <article class="lawyer-card card">
+    <div class="lawyer-card__avatar">
+      {
+        l.avatar ? (
+          <img src={l.avatar} alt={t(l.name, locale) ?? ''} loading="lazy" />
+        ) : (
+          <span>{initial}</span>
+        )
+      }
+    </div>
+    <div class="lawyer-card__body">
+      <h3 class="lawyer-card__name">{t(l.name, locale)}</h3>
+      {locale === 'en' && <div class="lawyer-card__name-en">{l.name.zh}</div>}
+      <div class="lawyer-card__title">{t(l.level, locale)}</div>
+      {!Astro.props.compact && <p class="lawyer-card__excerpt">{t(l.bio, locale)}</p>}
+      {
+        ta(l.practiceAreas, locale).length > 0 && (
+          <div class="lawyer-card__tags">
+            {ta(l.practiceAreas, locale)
+              .slice(0, 3)
+              .map((area) => (
+                <span class="tag">{area}</span>
+              ))}
+          </div>
+        )
+      }
+    </div>
+  </article>
+</a>
+
+<style>
+  .lawyer-card-link {
+    display: block;
+    height: 100%;
+  }
+  .lawyer-card-link:hover {
+    text-decoration: none;
+  }
+  /* 卡片等高 */
+  .lawyer-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .lawyer-card__body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  .lawyer-card__excerpt {
+    flex-grow: 1;
+  }
+  .lawyer-card__tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+</style>

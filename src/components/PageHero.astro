@@ -1,0 +1,18 @@
+---
+/**
+ * 段落大标题 (内页 page hero)
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  lede?: string;
+  align?: 'left' | 'center';
+}
+const { eyebrow, title, lede, align = 'center' } = Astro.props;
+---
+
+<section class={`page-hero page-hero--${align}`}>
+  <span class="eyebrow eyebrow-rule eyebrow-rule--seal page-hero__eyebrow">{eyebrow}</span>
+  <h1 class="page-hero__title h2" set:html={title} />
+  {lede && <p class="page-hero__lede">{lede}</p>}
+</section>

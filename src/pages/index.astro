@@ -1,0 +1,12 @@
+---
+/**
+ * 中文首页（根路径 /）
+ */
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import HomePage from '~/components/HomePage.astro';
+const locale = 'zh' as const;
+---
+
+<BaseLayout>
+  <HomePage locale={locale} />
+</BaseLayout>

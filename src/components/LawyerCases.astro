@@ -1,0 +1,137 @@
+---
+/**
+ * 律师的代表案例列表 — 律师详情页和 practice 弹窗共用
+ *
+ * Props:
+ *   cases        — 该律师关联的案例（已预筛过 lawyerIds / leadLawyerId）
+ *   locale       — 当前语言
+ *   prefix       — 路由前缀（en 模式为 '/en'，否则空）
+ *   limit        — 最多展示多少条（默认不限）
+ *   compact      — 紧凑模式（弹窗里用，字号略小）
+ */
+import { t, type Locale } from '~/i18n';
+import type { CaseItem } from '~/lib/types';
+
+interface Props {
+  cases: CaseItem[];
+  locale: Locale;
+  prefix?: string;
+  limit?: number;
+  compact?: boolean;
+  emptyMessage?: string;
+}
+
+const { cases, locale, prefix = '', limit, compact = false, emptyMessage } = Astro.props;
+const list = typeof limit === 'number' ? cases.slice(0, limit) : cases;
+const defaultEmpty = t(
+  {
+    zh: '代表业绩按所内规则不公开披露，欢迎垂询详情。',
+    en: 'Selected works are not publicly disclosed per firm policy. Please inquire for details.',
+  },
+  locale,
+);
+---
+
+{
+  list.length > 0 ? (
+    <ul class:list={['lawyer-cases', { 'lawyer-cases--compact': compact }]}>
+      {list.map((c) => (
+        <li>
+          <a href={`${prefix}/cases/${c.slug}`} class="lawyer-cases__item">
+            <span class="lawyer-cases__type">{t(c.type, locale)}</span>
+            <span class="lawyer-cases__title">{t(c.title, locale)}</span>
+            <span class="lawyer-cases__arrow">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <p class="lawyer-cases__empty">{emptyMessage ?? defaultEmpty}</p>
+  )
+}
+
+<style>
+  .lawyer-cases {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .lawyer-cases li {
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .lawyer-cases li:first-child {
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .lawyer-cases__item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 16px 0;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      padding 0.25s,
+      color 0.2s;
+  }
+  .lawyer-cases__item:hover {
+    padding-left: 8px;
+    text-decoration: none;
+  }
+  .lawyer-cases__item:hover .lawyer-cases__arrow {
+    transform: translateX(3px);
+    color: var(--seal);
+  }
+  .lawyer-cases__item:hover .lawyer-cases__title {
+    color: var(--seal);
+  }
+
+  .lawyer-cases__type {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--seal);
+    font-weight: 500;
+  }
+  .lawyer-cases__title {
+    font-family: var(--serif-zh);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  :global(html[lang='en']) .lawyer-cases__title {
+    font-family: var(--serif-en);
+  }
+  .lawyer-cases__arrow {
+    color: var(--ink-soft);
+    font-size: 14px;
+    margin-top: 2px;
+    transition:
+      transform 0.2s,
+      color 0.2s;
+  }
+
+  .lawyer-cases--compact .lawyer-cases__item {
+    padding: 12px 0;
+    gap: 4px;
+  }
+  .lawyer-cases--compact .lawyer-cases__title {
+    font-size: 14px;
+  }
+  :global(html[lang='en']) .lawyer-cases--compact .lawyer-cases__title {
+    font-size: 13px;
+  }
+  .lawyer-cases--compact .lawyer-cases__type {
+    font-size: 10px;
+  }
+
+  .lawyer-cases__empty {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    font-style: italic;
+    margin: 0;
+  }
+</style>

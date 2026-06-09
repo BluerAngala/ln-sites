@@ -1,0 +1,177 @@
+---
+/**
+ * 通用印章组件 — 站点视觉统一
+ *
+ * mode:
+ *   - "chars"  2x2 排版（大字号艺术印），首页 Hero / 关于页
+ *   - "label"  1 行 2~4 字（小圆章 / 案例结局章）
+ *
+ * 定位：
+ *   - inline（默认）：文档流，自身占位
+ *   - absolute：相对于最近的 position:relative 容器右上角
+ *
+ * 用法：
+ *   <Stamp mode="chars" size="lg" />
+ *   <Stamp mode="label" size="md" outcome="win" />
+ *   <Stamp mode="label" size="sm" outcome="mediation" position="absolute" />
+ *
+ * 设计要点：关键尺寸/颜色全部用 inline style，组件样式仅做微调（旋转、caption），
+ * 保证在 dev 模式 scoped CSS 注入异常时仍能正确渲染。
+ */
+type Mode = 'chars' | 'label';
+type Size = 'sm' | 'md' | 'lg';
+type Outcome = 'win' | 'mediation' | 'partial' | 'pending' | 'default';
+type Position = 'inline' | 'absolute';
+
+interface Props {
+  mode?: Mode;
+  size?: Size;
+  outcome?: Outcome;
+  chars?: [string, string, string, string];
+  text?: string;
+  caption?: string;
+  position?: Position;
+  offset?: { top?: number; right?: number };
+  locale?: 'zh' | 'en';
+}
+
+const {
+  mode = 'label',
+  size = 'md',
+  outcome = 'default',
+  chars = ['嶺', '南', '律', '師'],
+  text,
+  caption,
+  position = 'inline',
+  offset = {},
+  locale = 'zh',
+} = Astro.props;
+
+const OUTCOME_LABEL: Record<Outcome, { zh: string; en: string }> = {
+  win: { zh: '胜诉', en: 'WON' },
+  mediation: { zh: '调解', en: 'SETTLED' },
+  partial: { zh: '部分', en: 'PARTIAL' },
+  pending: { zh: '审理', en: 'PENDING' },
+  default: { zh: '岭南', en: 'LINGNAN' },
+};
+
+const label =
+  text ??
+  (mode === 'label'
+    ? locale === 'en'
+      ? OUTCOME_LABEL[outcome].en
+      : OUTCOME_LABEL[outcome].zh
+    : '');
+
+const DIM: Record<Mode, Record<Size, number>> = {
+  chars: { sm: 140, md: 200, lg: 240 },
+  label: { sm: 64, md: 90, lg: 140 },
+};
+const FONT: Record<Mode, Record<Size, number>> = {
+  chars: { sm: 24, md: 32, lg: 44 },
+  label: { sm: 18, md: 24, lg: 36 },
+};
+const INSET: Record<Mode, Record<Size, number>> = {
+  chars: { sm: 6, md: 8, lg: 10 },
+  label: { sm: 5, md: 6, lg: 10 },
+};
+const BORDER: Record<Mode, Record<Size, number>> = {
+  chars: { sm: 1.5, md: 2, lg: 2 },
+  label: { sm: 1.2, md: 1.5, lg: 2 },
+};
+const ROTATE: Record<Mode, Record<Size, number>> = {
+  chars: { sm: -3, md: -3, lg: -3 },
+  label: { sm: -12, md: -12, lg: -8 },
+};
+
+const OUTCOME_COLOR: Record<Outcome, string> = {
+  win: 'var(--seal)',
+  mediation: '#2F5D50',
+  partial: '#8B6B2E',
+  pending: 'var(--ink-soft)',
+  default: 'var(--seal)',
+};
+
+const dim = DIM[mode][size];
+const font = FONT[mode][size];
+const inset = INSET[mode]?.[size] ?? 6;
+const border = BORDER[mode]?.[size] ?? 1.5;
+const rotate = ROTATE[mode]?.[size] ?? -8;
+const color = OUTCOME_COLOR[outcome];
+
+const isAbs = position === 'absolute';
+const top = offset.top ?? -Math.round(dim * 0.3);
+const right = offset.right ?? -Math.round(dim * 0.22);
+const rotateHover = rotate + 10;
+
+// inline style 写关键样式（dev HMR 异常时仍能正确渲染）
+const wrapStyle = [
+  isAbs ? `position:absolute;` : `display:inline-block;`,
+  isAbs ? `top:${top}px;right:${right}px;` : '',
+  `width:${dim}px;height:${dim}px;`,
+  `pointer-events:none;`,
+].join('');
+
+const bodyStyle = [
+  `position:relative;`,
+  `width:100%;height:100%;`,
+  `background:${color};`,
+  `color:var(--bg);`,
+  `display:grid;place-items:center;`,
+  `border-radius:50%;`,
+  `box-shadow:var(--shadow-stamp);`,
+  `transform:rotate(${rotate}deg);`,
+  `transition:transform .5s cubic-bezier(.2,.7,.2,1);`,
+].join('');
+
+const ringStyle = `position:absolute;inset:${inset}px;border:${border}px solid var(--bg);border-radius:50%;pointer-events:none;`;
+
+const textStyle =
+  mode === 'chars'
+    ? `display:grid;grid-template-columns:1fr 1fr;gap:${Math.round(dim * 0.04)}px;font-family:var(--serif-zh);font-weight:700;font-size:${font}px;line-height:1;letter-spacing:0.05em;text-align:center;`
+    : `font-family:var(--serif-zh);font-weight:700;font-size:${font}px;line-height:1;letter-spacing:0.05em;white-space:nowrap;`;
+---
+
+<div
+  class={`stamp stamp--${mode} stamp--${size} stamp--${outcome} ${isAbs ? 'stamp--abs' : 'stamp--inline'}`}
+  style={wrapStyle}
+  role="img"
+  aria-label={mode === 'label' ? label : (caption ?? '印章')}
+>
+  <div class="stamp__body" style={bodyStyle}>
+    <span style="position:absolute;inset:0;pointer-events:none;border-radius:50%;"></span>
+    <span aria-hidden="true" style={ringStyle}></span>
+    {
+      mode === 'chars' ? (
+        <span class="stamp__grid" style={textStyle}>
+          <span>{chars[0]}</span>
+          <span>{chars[1]}</span>
+          <span>{chars[2]}</span>
+          <span>{chars[3]}</span>
+        </span>
+      ) : (
+        <span class="stamp__text" style={textStyle}>
+          {label}
+        </span>
+      )
+    }
+  </div>
+  {caption && <div class="stamp__caption">{caption}</div>}
+</div>
+
+<style>
+  /* 仅做 hover 与 caption 微调，尺寸/形状全部已 inline，无需依赖此文件 */
+  .stamp--lg:hover .stamp__body {
+    transform: rotate(2deg) scale(1.04);
+  }
+  .stamp__caption {
+    margin-top: 14px;
+    text-align: center;
+    font-family: var(--serif-en);
+    font-size: 11px;
+    letter-spacing: 0.4em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+</style>

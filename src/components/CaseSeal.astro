@@ -1,0 +1,32 @@
+---
+/**
+ * 案例结局印章（薄壳）— 列表卡 / 详情页共用
+ * 实际实现见 Stamp.astro
+ *
+ * 用法：<CaseSeal outcome="win" size="md" locale={locale} />
+ */
+import Stamp from '~/components/Stamp.astro';
+
+type Outcome = 'win' | 'mediation' | 'partial' | 'pending';
+type Size = 'sm' | 'md' | 'lg';
+
+interface Props {
+  outcome?: Outcome;
+  size?: Size;
+  locale?: 'zh' | 'en';
+  offset?: { top: number; right: number };
+  withLabel?: boolean;
+}
+
+const { outcome = 'win', size = 'md', locale = 'zh', offset, withLabel = false } = Astro.props;
+---
+
+<Stamp
+  mode="label"
+  size={size}
+  outcome={outcome}
+  locale={locale}
+  position="absolute"
+  offset={offset}
+  text={withLabel ? (locale === 'en' ? 'CASE' : '案') : undefined}
+/>

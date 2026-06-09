@@ -1,0 +1,234 @@
+---
+/**
+ * 业绩案例卡（专业案卷风）
+ * - 顶部业务领域 tag
+ * - 标题 + 短标题
+ * - 三段信息（背景/介入/收获）左侧编号 + 短句摘要
+ * - 关键数字 callout（从 result 自动提取）
+ * - 右上角圆形胜诉印章（复用 CaseSeal）
+ * - 右下"查看详情"链接
+ */
+import type { CaseItem } from '~/lib/types';
+import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import CaseSeal from '~/components/CaseSeal.astro';
+
+interface Props {
+  case: CaseItem;
+  locale?: Locale;
+}
+const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const c = Astro.props.case;
+
+const outcome = c.outcome ?? 'win';
+
+const resultText = t(c.result, locale) ?? '';
+const numberMatch = resultText.match(/(\d+(?:[.,]\d+)?\s*(?:亿|万|%|项|条|起)?)/);
+const highlight = numberMatch ? numberMatch[0].trim() : '';
+
+const href = `${locale === 'en' ? '/en' : ''}/cases/${c.slug}`;
+const fullText = t(c.title, locale) ?? '';
+const shortTitle = fullText.length > 28 ? fullText.slice(0, 28) + '…' : fullText;
+---
+
+<a
+  class="case-card-link"
+  href={href}
+  data-practice={t(c.practiceArea, locale) ?? ''}
+  data-outcome={outcome}
+>
+  <article class="case-card">
+    <CaseSeal outcome={outcome} size="md" locale={locale} />
+
+    <header class="case-card__top">
+      <span class="case-card__practice">{t(c.practiceArea, locale) ?? '—'}</span>
+    </header>
+
+    <h3 class="case-card__title">{shortTitle}</h3>
+
+    <div class="case-card__body">
+      <div class="case-card__row">
+        <span class="case-card__row-num">01</span>
+        <div class="case-card__row-body">
+          <span class="case-card__row-label">案情 · Background</span>
+          <p class="case-card__row-text">{t(c.background, locale)}</p>
+        </div>
+      </div>
+      <div class="case-card__row">
+        <span class="case-card__row-num">02</span>
+        <div class="case-card__row-body">
+          <span class="case-card__row-label">律师介入 · Approach</span>
+          <p class="case-card__row-text">{t(c.approach, locale)}</p>
+        </div>
+      </div>
+      <div class="case-card__row case-card__row--result">
+        <span class="case-card__row-num">03</span>
+        <div class="case-card__row-body">
+          <span class="case-card__row-label">客户收获 · Result</span>
+          <p class="case-card__row-text">{resultText}</p>
+          {highlight && <span class="case-card__callout">{highlight}</span>}
+        </div>
+      </div>
+    </div>
+
+    <div class="case-card__cta-wrap">
+      <span class="case-card__cta">查看详情 <span class="arrow">→</span></span>
+    </div>
+  </article>
+</a>
+
+<style>
+  .case-card-link {
+    display: block;
+    height: 100%;
+    color: inherit;
+  }
+  .case-card-link:hover {
+    text-decoration: none;
+  }
+
+  .case-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg);
+    border: 1px solid var(--rule-soft);
+    padding: 38px 28px 24px;
+    transition:
+      border-color 0.35s ease,
+      transform 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+  .case-card-link:hover .case-card {
+    border-color: var(--ink);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-2);
+  }
+
+  /* 顶边装饰条 */
+  .case-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      var(--seal) 0%,
+      var(--seal) 30%,
+      transparent 30%,
+      transparent 100%
+    );
+  }
+
+  /* 顶部：仅业务领域 */
+  .case-card__top {
+    margin-bottom: 18px;
+  }
+  .case-card__practice {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--serif-zh);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  /* 标题区 */
+  .case-card__title {
+    font-family: var(--serif-zh);
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    margin: 0 0 22px;
+    color: var(--ink);
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+
+  /* 三段信息（编号行） */
+  .case-card__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .case-card__row {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 12px;
+    align-items: start;
+  }
+  .case-card__row-num {
+    font-family: var(--serif-en);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-mute);
+    line-height: 1;
+    padding-top: 2px;
+  }
+  .case-card__row-label {
+    display: block;
+    font-family: var(--serif-en);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+  }
+  .case-card__row-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .case-card__row--result .case-card__row-num {
+    color: var(--seal);
+  }
+  .case-card__row--result .case-card__row-label {
+    color: var(--seal);
+  }
+
+  .case-card__callout {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 3px 10px;
+    background: var(--seal);
+    color: var(--bg);
+    font-family: var(--serif-zh);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  /* 底部：CTA */
+  .case-card__cta-wrap {
+    margin-top: auto;
+    padding-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .case-card__cta {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--seal);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .case-card__cta .arrow {
+    transition: transform 0.3s ease;
+  }
+  .case-card-link:hover .case-card__cta .arrow {
+    transform: translateX(4px);
+  }
+</style>
