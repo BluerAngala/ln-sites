@@ -21,6 +21,11 @@ const siteName = process.env.PUBLIC_SITE_NAME ?? '广东岭南律师事务所';
 const siteNameEn = process.env.PUBLIC_SITE_NAME_EN ?? 'Lingnan · Counsel & Attorneys at Law';
 const siteNameLocalized = locale === 'en' ? siteNameEn : siteName;
 
+// Coze 智能体：硬编码（绕过 env，避免 dev 模式读不到 .env 的问题）
+const cozeBotId = '7649212267900616714';
+const cozeToken = 'pat_239FejJj5uHmYC2nFjjwI9Mq6teR54a4F4zGWunULKLiuIBAudofeJTkqRoGy0e8';
+const cozeEnabled = Boolean(cozeBotId && cozeToken);
+
 const fullTitle = title ? `${title} · ${siteNameLocalized}` : `${siteNameLocalized}`;
 const fullDescription =
   description ??
@@ -94,5 +99,24 @@ const canonical = new URL(
         });
       }
     </script>
+
+    {
+      cozeEnabled && (
+        <>
+          <div
+            id="coze-chat-container"
+            style="position: fixed; right: 24px; bottom: 24px; z-index: 9999; width: 60px; height: 60px;"
+          />
+          <script
+            src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"
+            async
+          />
+          <script is:inline define:vars={{ botId: cozeBotId, token: cozeToken }}>
+            window.__cozeBotId = botId; window.__cozeToken = token;
+          </script>
+          <script src="/scripts/coze-init.js" />
+        </>
+      )
+    }
   </body>
 </html>
