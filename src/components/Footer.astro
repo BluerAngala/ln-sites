@@ -1,13 +1,11 @@
 ---
 import { getOffices } from '~/lib/content';
-import { t, ut, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, ut, type Locale } from '~/i18n';
+import { detectLocale, prefixFor, localizedHref } from '~/lib/locale';
 import { getSiteConfig, getPractices } from '~/lib/content';
 
-function detectLocale(): Locale {
-  if (Astro.url.pathname.startsWith('/en/') || Astro.url.pathname === '/en') return 'en';
-  return DEFAULT_LOCALE;
-}
-const locale: Locale = detectLocale();
+const locale: Locale = detectLocale(Astro.url.pathname);
+const prefix = prefixFor(locale);
 const offices = await getOffices();
 const hq = offices.find((o) => o.isHeadquarters) ?? offices[0];
 const config = await getSiteConfig();
@@ -33,10 +31,7 @@ const email = config.contactEmail;
           {
             practices.map((p) => (
               <li>
-                <a
-                  href={`${locale === 'en' ? '/en' : ''}/practice?area=${p.id}`}
-                  data-practice-link={p.id}
-                >
+                <a href={localizedHref(`/practice?area=${p.id}`, locale)} data-practice-link={p.id}>
                   {t(p.name, locale)}
                 </a>
               </li>
@@ -48,11 +43,11 @@ const email = config.contactEmail;
       <div class="footer__col">
         <h4>{ut('nav.about', locale)}</h4>
         <ul>
-          <li><a href={`${locale === 'en' ? '/en' : ''}/about`}>{ut('nav.about', locale)}</a></li>
-          <li><a href={`${locale === 'en' ? '/en' : ''}/team`}>{ut('nav.team', locale)}</a></li>
-          <li><a href={`${locale === 'en' ? '/en' : ''}/honors`}>{ut('nav.honors', locale)}</a></li>
-          <li><a href={`${locale === 'en' ? '/en' : ''}/news`}>{ut('nav.news', locale)}</a></li>
-          <li><a href={`${locale === 'en' ? '/en' : ''}/social`}>{ut('nav.social', locale)}</a></li>
+          <li><a href={localizedHref('/about', locale)}>{ut('nav.about', locale)}</a></li>
+          <li><a href={localizedHref('/team', locale)}>{ut('nav.team', locale)}</a></li>
+          <li><a href={localizedHref('/honors', locale)}>{ut('nav.honors', locale)}</a></li>
+          <li><a href={localizedHref('/news', locale)}>{ut('nav.news', locale)}</a></li>
+          <li><a href={localizedHref('/social', locale)}>{ut('nav.social', locale)}</a></li>
         </ul>
       </div>
 
@@ -75,9 +70,7 @@ const email = config.contactEmail;
             ) : null
           }
           <li>
-            <a href={`${locale === 'en' ? '/en' : ''}/contact`}
-              >{ut('contact.submit' as any, locale)}</a
-            >
+            <a href={localizedHref('/contact', locale)}>{ut('contact.submit' as any, locale)}</a>
           </li>
         </ul>
       </div>

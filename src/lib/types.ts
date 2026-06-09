@@ -185,9 +185,21 @@ export interface ContentBundle {
 
 /* ============================================================
    工具：从 I18n 字段取值（缺翻译时回退中文）
+   - t()  : 通用回退，返回 T | undefined
+   - ts() : 强制 string，缺翻译返回 ''
+   - ta() : 强制 string[]，缺翻译返回 []
    ============================================================ */
 
 export function t<T>(field: I18n<T> | undefined, locale: Locale): T | undefined {
   if (!field) return undefined;
-  return (locale === 'en' ? field.en : field.zh) ?? field.zh;
+  if (locale === 'en') return (field.en ?? field.zh) as T;
+  return field.zh as T;
+}
+
+export function ts(field: I18n<string> | undefined, locale: Locale): string {
+  return t(field, locale) ?? '';
+}
+
+export function ta(field: I18n<string[]> | undefined, locale: Locale): string[] {
+  return t(field, locale) ?? [];
 }

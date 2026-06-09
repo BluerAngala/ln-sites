@@ -1,18 +1,19 @@
 ---
 import type { Lawyer } from '~/lib/types';
-import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, ta, type Locale } from '~/i18n';
+import { detectLocale, prefixFor } from '~/lib/locale';
 
 interface Props {
   lawyer: Lawyer;
   compact?: boolean;
   locale?: Locale;
 }
-const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const locale: Locale = Astro.props.locale ?? detectLocale(Astro.url.pathname);
 const l = Astro.props.lawyer;
 const initial = (t(l.name, locale) ?? '?').charAt(0);
 ---
 
-<a class="lawyer-card-link" href={`${locale === 'en' ? '/en' : ''}/team/${l.slug}`}>
+<a class="lawyer-card-link" href={`${prefixFor(locale)}/team/${l.slug}`}>
   <article class="lawyer-card card">
     <div class="lawyer-card__avatar">
       {

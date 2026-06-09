@@ -1,35 +1,15 @@
 /**
  * 极简 i18n 工具
- * - Locale 类型 + 默认值
- * - I18n<T> 嵌套对象的 fallback helper
+ * - Locale / I18n<T> / t() / ts() / ta() 一律来自 ~/lib/types
  * - 一份小 UI 字符串字典（仅页面外的固定文案：nav / 按钮 / 章节）
  *   内容字段（律师名、案例描述等）用 I18n<T> 直接写在 mock 数据里
- *   模板里写 `name[locale]` / `t(locale, 'nav.home')`
+ *   模板里写 `ts(name, locale)` / `ut('nav.home', locale)`
  */
 import type { I18n, Locale } from '~/lib/types';
 
 export type { I18n, Locale };
+export { t, ts, ta } from '~/lib/types';
 export const DEFAULT_LOCALE: Locale = 'zh';
-
-/** 从 I18n<T> 拿当前 locale 的值，缺 en 时回退到 zh
- *  当 T = string 时缺翻译返回 ''（避免 undefined 透到模板）
- */
-export function t<T>(field: I18n<T> | undefined, locale: Locale): T;
-export function t(field: I18n<string> | undefined, locale: Locale): string;
-export function t<T>(field: I18n<T> | undefined, locale: Locale): T {
-  if (!field) return '' as unknown as T;
-  return (field[locale] ?? field.zh) as T;
-}
-
-/** 强制返回字符串（缺翻译时用 fallback） */
-export function ts(field: I18n<string> | undefined, locale: Locale): string {
-  return t(field, locale) ?? '';
-}
-
-/** 数组 fallback */
-export function ta(field: I18n<string[]> | undefined, locale: Locale): string[] {
-  return t(field, locale) ?? [];
-}
 
 /* ============================================================
    UI 字符串字典（仅 nav / 按钮 / 段落标题，约 30 个 key）
@@ -89,24 +69,14 @@ export function ut(key: keyof typeof ui, locale: Locale): string {
 }
 
 /* ============================================================
-   路径切换：根据当前 locale + 目标 locale 计算新 URL
+   路径切换：实现已统一在 ~/lib/locale.ts
+   这里只 re-export 保留旧 import 兼容
    ============================================================ */
-
-/** 去掉 /en 前缀 */
-function stripEn(pathname: string): string {
-  if (pathname === '/en' || pathname === '/en/') return '/';
-  if (pathname.startsWith('/en/')) return pathname.slice(3) || '/';
-  return pathname;
-}
-
-/** 加上 /en 前缀 */
-function addEn(pathname: string): string {
-  if (pathname === '/' || pathname === '') return '/en/';
-  return '/en' + pathname;
-}
-
-/** 切换到目标 locale 的等价 URL（中文 ↔ 英文） */
-export function switchLocaleUrl(currentPath: string, target: Locale): string {
-  if (target === 'zh') return stripEn(currentPath);
-  return addEn(stripEn(currentPath));
-}
+export {
+  switchLocaleUrl,
+  stripEnPrefix,
+  localizedHref,
+  detectLocale,
+  prefixFor,
+  isEnPath,
+} from '~/lib/locale';

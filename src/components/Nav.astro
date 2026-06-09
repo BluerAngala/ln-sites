@@ -1,26 +1,23 @@
 ---
-import { ut, switchLocaleUrl, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { ut, switchLocaleUrl, type Locale } from '~/i18n';
+import { detectLocale, prefixFor } from '~/lib/locale';
 
-// 从 URL 推断（页面没传 prop 时）：/en/* → en，否则 zh
-function detectLocale(): Locale {
-  if (Astro.url.pathname.startsWith('/en/') || Astro.url.pathname === '/en') return 'en';
-  return DEFAULT_LOCALE;
-}
-const locale: Locale = detectLocale();
+const locale: Locale = detectLocale(Astro.url.pathname);
+const prefix = prefixFor(locale);
 const pathname = Astro.url.pathname;
 
 const navItems: Array<{ key: Parameters<typeof ut>[0]; href: string; cta?: boolean }> = [
-  { key: 'nav.about', href: locale === 'en' ? '/en/about' : '/about' },
-  { key: 'nav.practice', href: locale === 'en' ? '/en/practice' : '/practice' },
-  { key: 'nav.team', href: locale === 'en' ? '/en/team' : '/team' },
-  { key: 'nav.cases', href: locale === 'en' ? '/en/cases' : '/cases' },
-  { key: 'nav.news', href: locale === 'en' ? '/en/news' : '/news' },
-  { key: 'nav.honors', href: locale === 'en' ? '/en/honors' : '/honors' },
-  { key: 'nav.social', href: locale === 'en' ? '/en/social' : '/social' },
-  { key: 'nav.contact', href: locale === 'en' ? '/en/contact' : '/contact', cta: true },
+  { key: 'nav.about', href: `${prefix}/about` },
+  { key: 'nav.practice', href: `${prefix}/practice` },
+  { key: 'nav.team', href: `${prefix}/team` },
+  { key: 'nav.cases', href: `${prefix}/cases` },
+  { key: 'nav.news', href: `${prefix}/news` },
+  { key: 'nav.honors', href: `${prefix}/honors` },
+  { key: 'nav.social', href: `${prefix}/social` },
+  { key: 'nav.contact', href: `${prefix}/contact`, cta: true },
 ];
 
-const homeHref = locale === 'zh' ? '/' : '/en/';
+const homeHref = prefix === '' ? '/' : '/en/';
 const cleanPath = pathname.replace(/^\/(en|zh)/, '') || '/';
 const isActive = (href: string) => {
   const c = href.replace(/^\/(en|zh)/, '') || '/';

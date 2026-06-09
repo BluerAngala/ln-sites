@@ -3,9 +3,10 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import SectionHeader from '~/components/SectionHeader.astro';
 import LawyerCard from '~/components/LawyerCard.astro';
 import { getLawyers } from '~/lib/content';
-import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, type Locale } from '~/i18n';
+import { detectLocale } from '~/lib/locale';
 
-const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
+const locale: Locale = detectLocale(Astro.url.pathname);
 const lawyers = await getLawyers();
 const partners = lawyers.filter(
   (l) =>

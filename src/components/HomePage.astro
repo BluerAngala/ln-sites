@@ -12,11 +12,13 @@ import HonorWall from '~/components/HonorWall.astro';
 import SectionHeader from '~/components/SectionHeader.astro';
 import { getLawyers, getLatestNews, getPractices, getHonors, getSiteConfig } from '~/lib/content';
 import { t, type Locale } from '~/i18n';
+import { prefixFor } from '~/lib/locale';
 
 interface Props {
   locale: Locale;
 }
 const locale = Astro.props.locale;
+const prefix = prefixFor(locale);
 
 const config = await getSiteConfig();
 const [lawyers, news, practices, honors] = await Promise.all([
@@ -51,11 +53,11 @@ const [lawyers, news, practices, honors] = await Promise.all([
       set:html={(t<string>(config.heroLede, locale) ?? '').replace(/\n/g, '<br/>')}
     />
     <div class="hero__cta">
-      <a href={`${locale === 'en' ? '/en' : ''}/about`} class="hero__btn hero__btn--primary">
+      <a href={`${prefix}/about`} class="hero__btn hero__btn--primary">
         {t({ zh: '走进岭南', en: 'About Us' }, locale)}
         <span class="arrow">→</span>
       </a>
-      <a href={`${locale === 'en' ? '/en' : ''}/contact`} class="hero__btn hero__btn--ghost">
+      <a href={`${prefix}/contact`} class="hero__btn hero__btn--ghost">
         {t({ zh: '委托咨询', en: 'Engage Us' }, locale)}
         <span class="arrow">→</span>
       </a>
@@ -106,7 +108,7 @@ const [lawyers, news, practices, honors] = await Promise.all([
         </blockquote>
         <div class="prose" set:html={t(config.aboutBody, locale) ?? ''} />
         <div style="text-align: right; margin-top: 32px;">
-          <a href={`${locale === 'en' ? '/en' : ''}/about`} class="btn btn--ghost"
+          <a href={`${prefix}/about`} class="btn btn--ghost"
             >{t({ zh: '了解更多', en: 'Learn More' }, locale)} →</a
           >
         </div>
@@ -150,11 +152,7 @@ const [lawyers, news, practices, honors] = await Promise.all([
     <div class="practices-grid">
       {
         practices.map((p, i) => (
-          <a
-            href={`${locale === 'en' ? '/en' : ''}/practice#${p.id}`}
-            class="practice-card"
-            data-idx={i + 1}
-          >
+          <a href={`${prefix}/practice#${p.id}`} class="practice-card" data-idx={i + 1}>
             <div class="practice-card__main">
               <div class="practice-card__head">
                 <div class="practice-card__num">{String(i + 1).padStart(2, '0')}</div>
@@ -200,7 +198,7 @@ const [lawyers, news, practices, honors] = await Promise.all([
       locale={locale}
     />
     <div style="text-align: right; margin-bottom: 32px;">
-      <a href={`${locale === 'en' ? '/en' : ''}/honors`} class="btn btn--ghost"
+      <a href={`${prefix}/honors`} class="btn btn--ghost"
         >{t({ zh: '全部荣誉', en: 'All Honors' }, locale)} →</a
       >
     </div>
@@ -217,7 +215,7 @@ const [lawyers, news, practices, honors] = await Promise.all([
       locale={locale}
     />
     <div style="text-align: right; margin-bottom: 40px;">
-      <a href={`${locale === 'en' ? '/en' : ''}/news`} class="btn btn--ghost"
+      <a href={`${prefix}/news`} class="btn btn--ghost"
         >{t({ zh: '全部资讯', en: 'All News' }, locale)} →</a
       >
     </div>
@@ -242,7 +240,7 @@ const [lawyers, news, practices, honors] = await Promise.all([
       {t(config.tagline2, locale)}
     </p>
     <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-      <a href={`${locale === 'en' ? '/en' : ''}/contact`} class="btn btn--seal"
+      <a href={`${prefix}/contact`} class="btn btn--seal"
         >{t({ zh: '发起委托', en: 'Engage Us' }, locale)} →</a
       >
       <a

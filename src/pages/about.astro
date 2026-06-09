@@ -2,9 +2,10 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import SectionHeader from '~/components/SectionHeader.astro';
 import { getSiteConfig, getOffices } from '~/lib/content';
-import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, type Locale } from '~/i18n';
+import { detectLocale } from '~/lib/locale';
 
-const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
+const locale: Locale = detectLocale(Astro.url.pathname);
 const config = await getSiteConfig();
 const offices = await getOffices();
 const hq = offices.find((o) => o.isHeadquarters);

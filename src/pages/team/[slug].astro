@@ -2,7 +2,8 @@
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import LawyerCases from '~/components/LawyerCases.astro';
 import { getLawyers, getLawyerBySlug, getCases } from '~/lib/content';
-import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, ta, type Locale } from '~/i18n';
+import { detectLocale, prefixFor } from '~/lib/locale';
 
 export async function getStaticPaths() {
   const lawyers = await getLawyers();
@@ -17,9 +18,9 @@ export async function getStaticPaths() {
 
 const { lawyerSlug } = Astro.props as { lawyerSlug: string; locale: Locale };
 const locale: Locale =
-  Astro.url.pathname.startsWith('/en/') || Astro.url.pathname === '/en' ? 'en' : DEFAULT_LOCALE;
+  (Astro.props as { locale?: Locale }).locale ?? detectLocale(Astro.url.pathname);
 const lawyer = await getLawyerBySlug(lawyerSlug!);
-if (!lawyer) return Astro.redirect(`/${locale}/team`);
+if (!lawyer) return Astro.redirect(`${prefixFor(locale)}/team`);
 
 const allLawyers = await getLawyers();
 const allCases = await getCases();
@@ -29,7 +30,7 @@ const relatedCases = allCases
 const allRelatedLawyers = allLawyers
   .filter((l) => l.id !== lawyer.id && l.office.zh === lawyer.office.zh)
   .slice(0, 4);
-const prefix = locale === 'en' ? '/en' : '';
+const prefix = prefixFor(locale);
 
 // 入所年份(若 level 包含"高级合伙人"且 1984 至今 给个 10+)
 const yearsAtFirm = 10 + (lawyer.order ?? 0);

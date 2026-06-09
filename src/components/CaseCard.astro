@@ -9,14 +9,15 @@
  * - 右下"查看详情"链接
  */
 import type { CaseItem } from '~/lib/types';
-import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, type Locale } from '~/i18n';
+import { detectLocale, prefixFor } from '~/lib/locale';
 import CaseSeal from '~/components/CaseSeal.astro';
 
 interface Props {
   case: CaseItem;
   locale?: Locale;
 }
-const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const locale: Locale = Astro.props.locale ?? detectLocale(Astro.url.pathname);
 const c = Astro.props.case;
 
 const outcome = c.outcome ?? 'win';
@@ -25,7 +26,7 @@ const resultText = t(c.result, locale) ?? '';
 const numberMatch = resultText.match(/(\d+(?:[.,]\d+)?\s*(?:亿|万|%|项|条|起)?)/);
 const highlight = numberMatch ? numberMatch[0].trim() : '';
 
-const href = `${locale === 'en' ? '/en' : ''}/cases/${c.slug}`;
+const href = `${prefixFor(locale)}/cases/${c.slug}`;
 const fullText = t(c.title, locale) ?? '';
 const shortTitle = fullText.length > 28 ? fullText.slice(0, 28) + '…' : fullText;
 ---

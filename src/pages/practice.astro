@@ -3,12 +3,13 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import SectionHeader from '~/components/SectionHeader.astro';
 import LawyerCases from '~/components/LawyerCases.astro';
 import { getPractices, getCases, getLawyers } from '~/lib/content';
-import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, type Locale } from '~/i18n';
+import { detectLocale, prefixFor } from '~/lib/locale';
 
-const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
+const locale: Locale = detectLocale(Astro.url.pathname);
 const [practices, cases, lawyers] = await Promise.all([getPractices(), getCases(), getLawyers()]);
 
-const prefix = locale === 'en' ? '/en' : '';
+const prefix = prefixFor(locale);
 
 interface PracticeView {
   practice: (typeof practices)[number];

@@ -12,7 +12,8 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import CaseSeal from '~/components/CaseSeal.astro';
 import CaseCard from '~/components/CaseCard.astro';
 import { getCases, getCaseBySlug, getLawyers, getRelatedCases } from '~/lib/content';
-import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, ta, type Locale } from '~/i18n';
+import { detectLocale, prefixFor } from '~/lib/locale';
 
 export async function getStaticPaths() {
   const cases = await getCases();
@@ -30,9 +31,9 @@ export async function getStaticPaths() {
 
 const { caseSlug } = Astro.props as { caseSlug: string; locale: Locale };
 const locale: Locale =
-  Astro.url.pathname.startsWith('/en/') || Astro.url.pathname === '/en' ? 'en' : DEFAULT_LOCALE;
+  (Astro.props as { locale?: Locale }).locale ?? detectLocale(Astro.url.pathname);
 const c = await getCaseBySlug(caseSlug);
-if (!c) return Astro.redirect(`/${locale}/cases`);
+if (!c) return Astro.redirect(`${prefixFor(locale)}/cases`);
 
 const allLawyers = await getLawyers();
 const leadLawyer = c.leadLawyerId ? allLawyers.find((l) => l.id === c.leadLawyerId) : undefined;

@@ -3,9 +3,10 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 import SectionHeader from '~/components/SectionHeader.astro';
 import NewsCard from '~/components/NewsCard.astro';
 import { getNews } from '~/lib/content';
-import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, type Locale } from '~/i18n';
+import { detectLocale } from '~/lib/locale';
 
-const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
+const locale: Locale = detectLocale(Astro.url.pathname);
 const allNews = await getNews();
 const [first, ...rest] = allNews;
 ---

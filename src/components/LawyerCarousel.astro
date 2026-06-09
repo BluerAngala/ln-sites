@@ -1,6 +1,7 @@
 ---
 import type { Lawyer, I18n } from '~/lib/types';
-import { t, ta, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, ta, type Locale } from '~/i18n';
+import { detectLocale, prefixFor } from '~/lib/locale';
 import SectionHeader from '~/components/SectionHeader.astro';
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
   lede?: I18n<string>;
   locale?: Locale;
 }
-const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const locale: Locale = Astro.props.locale ?? detectLocale(Astro.url.pathname);
 const {
   lawyers,
   title = { zh: '执业律师', en: 'Attorneys at Law' },
@@ -18,7 +19,7 @@ const {
   lede,
 } = Astro.props;
 const ledeText = lede ? (t(lede, locale) ?? '') : '';
-const prefix = locale === 'en' ? '/en' : '';
+const prefix = prefixFor(locale);
 ---
 
 <section class="lawyer-carousel" id="counsel">

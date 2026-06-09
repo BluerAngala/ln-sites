@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '~/layouts/BaseLayout.astro';
 import { getNews, getNewsBySlug } from '~/lib/content';
-import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, type Locale } from '~/i18n';
+import { detectLocale, prefixFor } from '~/lib/locale';
 
 export async function getStaticPaths() {
   const news = await getNews();
@@ -16,9 +17,9 @@ export async function getStaticPaths() {
 
 const { newsSlug } = Astro.props as { newsSlug: string; locale: Locale };
 const locale: Locale =
-  Astro.url.pathname.startsWith('/en/') || Astro.url.pathname === '/en' ? 'en' : DEFAULT_LOCALE;
+  (Astro.props as { locale?: Locale }).locale ?? detectLocale(Astro.url.pathname);
 const n = await getNewsBySlug(newsSlug);
-if (!n) return Astro.redirect(`/${locale}/news`);
+if (!n) return Astro.redirect(`${prefixFor(locale)}/news`);
 ---
 
 <BaseLayout title={t(n.title, locale) ?? ''} description={t(n.summary, locale)}>

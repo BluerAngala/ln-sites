@@ -3,13 +3,14 @@
  * 荣誉墙：3 列 + 自下而上自动滚动的无限循环 marquee
  */
 import type { Honor } from '~/lib/types';
-import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, type Locale } from '~/i18n';
+import { detectLocale } from '~/lib/locale';
 
 interface Props {
   honors: Honor[];
   locale?: Locale;
 }
-const locale: Locale = (Astro.props.locale ?? (Astro.currentLocale as Locale)) || DEFAULT_LOCALE;
+const locale: Locale = Astro.props.locale ?? detectLocale(Astro.url.pathname);
 const honors = Astro.props.honors;
 ---
 

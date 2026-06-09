@@ -1,11 +1,12 @@
 ---
 import { getSiteConfig } from '~/lib/content';
-import { t, DEFAULT_LOCALE, type Locale } from '~/i18n';
+import { t, type Locale } from '~/i18n';
+import { detectLocale } from '~/lib/locale';
 import type { I18n } from '~/lib/types';
 
 type StatItem = { num: I18n<string>; suffix: I18n<string>; label: I18n<string> };
 
-const locale: Locale = (Astro.currentLocale as Locale) || DEFAULT_LOCALE;
+const locale: Locale = detectLocale(Astro.url.pathname);
 const config = await getSiteConfig();
 ---
 
