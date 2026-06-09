@@ -1,0 +1,41 @@
+{
+  "name": "lingnan-law-web",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "广东岭南律师事务所官网 - Astro + 飞书多维表格",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "lint": "astro check",
+    "format": "prettier --write \"**/*.{astro,ts,tsx,js,mjs,cjs,json,md,css}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{astro,ts,tsx,js,mjs,cjs,json,md,css}\" --ignore-path .prettierignore",
+    "prepare": "husky",
+    "astro": "astro",
+    "lark:test": "node scripts/lark-test.mjs"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.0",
+    "@astrojs/sitemap": "^3.2.0",
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@types/node": "^22.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.3",
+    "prettier-plugin-astro": "^0.14.1",
+    "typescript": "^5.9.3"
+  },
+  "lint-staged": {
+    "*.{astro,ts,tsx,js,mjs,cjs,json,md,css}": [
+      "prettier --write --ignore-path .prettierignore"
+    ]
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
