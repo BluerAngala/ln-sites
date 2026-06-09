@@ -94,7 +94,7 @@ const config: SiteConfig = {
 };
 
 /* ============================================================
-   Lawyers — 含 11 张原站头像(王淼需补充)
+   Lawyers — 王淼因暂无头像已从列表移除
    数据来源:原站"律师简介"列表(高级合伙人 / 合伙人)
    ============================================================ */
 const lawyers: Lawyer[] = [
@@ -355,34 +355,6 @@ const lawyers: Lawyer[] = [
       zh: ['未成年人保护', '校园普法'],
       en: ["Minors' Rights Protection", 'Campus Legal Education'],
     },
-    education: { zh: ['中山大学法学硕士'], en: ['LL.M., Sun Yat-sen University'] },
-    languages: ['中文', '英文'],
-    office: { zh: '广州', en: 'Guangzhou' },
-  },
-  {
-    id: 'lawyer-10',
-    slug: 'wang-miao',
-    order: 10,
-    status: '在职',
-    name: { zh: '王淼', en: 'WANG Miao' },
-    level: { zh: '合伙人', en: 'Partner' },
-    avatar: '',
-    licenseNo: '',
-    phone: '020-81836088',
-    email: 'wm@lnlawfirm.cn',
-    bio: {
-      zh: '入选广州律协「法智惠企」讲师团，长期为中小企业提供法律服务。',
-      en: 'Selected for the Guangzhou Bar Association "Law Empowers Enterprises" lecturer team; long-standing legal services for SMEs.',
-    },
-    bioLong: {
-      zh: '<p>王淼律师，岭南所合伙人。2025 年 7 月，入选广州律协「法智惠企」讲师团。</p>',
-      en: '<p>Mr. Wang is a Partner at Lingnan. In July 2025, he was selected for the Guangzhou Bar Association "Law Empowers Enterprises" lecturer team.</p>',
-    },
-    practiceAreas: {
-      zh: ['公司商事', '民商事'],
-      en: ['Corporate & Commercial', 'Civil & Commercial'],
-    },
-    expertise: { zh: ['公司法', '中小企业法律服务'], en: ['Corporate Law', 'SME Legal Services'] },
     education: { zh: ['中山大学法学硕士'], en: ['LL.M., Sun Yat-sen University'] },
     languages: ['中文', '英文'],
     office: { zh: '广州', en: 'Guangzhou' },
