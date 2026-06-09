@@ -354,7 +354,19 @@ const initialAreaId = Astro.url.searchParams.get('area') ?? '';
         target.querySelector('.practice-area__head')?.setAttribute('aria-expanded', 'true');
         const p = target.querySelector('.practice-area__panel');
         if (p) p.hidden = false;
-        setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+        // 滚动到目标块的标题行（.practice-area__head）位于视口垂直中线
+        setTimeout(() => {
+          const head = target.querySelector('.practice-area__head');
+          const el = head || target;
+          const rect = el.getBoundingClientRect();
+          const elCenter = rect.top + window.scrollY + rect.height / 2;
+          const viewportCenter = window.innerHeight / 2;
+          const desired = elCenter - viewportCenter;
+          window.scrollTo({
+            top: Math.max(0, desired),
+            behavior: 'smooth',
+          });
+        }, 50);
       }
     }
     if (pendingLawyerId) {
@@ -474,7 +486,7 @@ const initialAreaId = Astro.url.searchParams.get('area') ?? '';
     font-family: var(--serif-en);
     font-size: 22px;
     font-weight: 300;
-    color: var(--ink);
+    color: var(--seal);
   }
   .practice-area__stat small {
     font-size: 11px;
